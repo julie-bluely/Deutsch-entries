@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Deutsch Entries</title>
+<link rel="stylesheet" href="site.css">
+<style>
+/* tighter container — more breathing room on the sides */
+.wrap{ max-width:1080px; padding-left:clamp(40px,8vw,96px); padding-right:clamp(40px,8vw,96px); }
+.about-hero{ display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(32px,5vw,72px); align-items:center; padding-top:clamp(40px,6vw,86px); padding-bottom:clamp(40px,6vw,86px); }
+.about-hero h1{ font-size:clamp(2.8rem,6.5vw,5rem); line-height:1; margin:16px 0 0; }
+.about-hero h1 em{ font-style:italic; color:var(--rug); }
+.about-hero .lede{ font-family:var(--serif); font-style:italic; font-size:clamp(1.2rem,2.4vw,1.6rem); color:var(--ink-soft); margin:22px 0 0; max-width:32ch; line-height:1.4; }
+.about-collage{ position:relative; height:clamp(380px,42vw,520px); }
+.about-collage .a-main{ position:absolute; right:4%; top:0; width:66%; height:90%; box-shadow:var(--shadow); }
+.about-collage .a-rug{ position:absolute; left:0; bottom:4%; width:46%; aspect-ratio:4/3; border:5px solid var(--paper); box-shadow:var(--shadow); border-radius:6px; overflow:hidden; transform:rotate(-4deg); z-index:2; }
+.about-collage .a-citrus{ position:absolute; left:30%; top:-2%; z-index:3; }
+.about-collage image-slot{ width:100%; height:100%; }
+
+.prose{ max-width:680px; margin:0 auto; font-size:18px; line-height:1.78; color:#34291f; }
+.prose h2{ font-size:clamp(1.7rem,3vw,2.3rem); margin:1.6em 0 .5em; }
+.prose h2 em{ font-style:italic; color:var(--rug); }
+.prose p{ margin:0 0 1.3em; }
+.prose .lead-de{ font-family:var(--serif); font-style:italic; color:var(--terracotta); font-size:1.2rem; }
+
+/* timeline */
+.timeline{ max-width:760px; margin:0 auto; }
+.tl-item{ display:grid; grid-template-columns:120px 1fr; gap:26px; padding:26px 0; border-top:1px solid var(--line); }
+.tl-item:last-child{ border-bottom:1px solid var(--line); }
+.tl-when{ font-family:var(--serif); font-size:1.3rem; color:var(--rug); }
+.tl-when small{ display:block; font-family:var(--sans); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin-top:4px; }
+.tl-body h4{ font-size:1.25rem; margin-bottom:6px; }
+.tl-body p{ margin:0; color:var(--ink-soft); font-size:15.5px; }
+.tl-body .de{ font-family:var(--serif); font-style:italic; color:var(--terracotta); }
+
+.values{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:14px; }
+.value{ background:var(--paper); border:1px solid var(--paper-edge); border-radius:12px; padding:28px 24px; }
+.value .num{ font-family:var(--serif); font-style:italic; font-size:1.6rem; color:var(--terracotta); }
+.value h4{ font-size:1.2rem; margin:10px 0 8px; }
+.value p{ font-size:14.5px; color:var(--ink-soft); margin:0; }
+
+.cta-band{ text-align:center; background:var(--cream-deep); border-radius:18px; padding:clamp(40px,6vw,72px); margin-top:20px; }
+.cta-band h2{ font-size:clamp(2rem,4vw,3rem); }
+.cta-band h2 em{ font-style:italic; color:var(--rug); }
+.cta-band p{ max-width:44ch; margin:16px auto 26px; color:var(--ink-soft); }
+
+.mobile-menu{ display:none; }
+@media (max-width:880px){
+  .about-hero{ grid-template-columns:1fr; }
+  .about-collage{ order:-1; height:360px; }
+  .values{ grid-template-columns:1fr; }
+}
+@media (max-width:620px){
+  .tl-item{ grid-template-columns:1fr; gap:8px; }
+  .mobile-menu.open{ display:flex; position:fixed; inset:0; z-index:100; background:rgba(43,33,26,.96); flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+  .mobile-menu a{ color:var(--cream); font-family:var(--serif); font-size:1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">Deutsch <em>Entries</em></span><span class="dot"></span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html" class="active">About</a><a href="archive.html#search" class="nav-search" aria-label="Search the archive">⌕</a><a href="login.html" class="nav-login">Login</a>
+    </nav>
+    <button class="nav-toggle">Menu</button>
+  </div>
+</header>
+<div class="mobile-menu"><a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a></div>
+
+<section class="wrap about-hero">
+  <div>
+    <span class="eyebrow">About the diary</span>
+    <h1>Learning to <em>belong</em>, one word at a time</h1>
+    <p class="lede">„Eine neue Sprache zu lernen heißt, ein zweites Mal Kind zu sein — nur höflicher.“</p>
+  </div>
+  <div class="about-collage">
+    <div class="a-main arch"><image-slot id="about-main" shape="rect" placeholder="Author at a desk / window"></image-slot></div>
+    <div class="a-rug"><image-slot id="about-rug" shape="rect" placeholder="Persian rug corner"></image-slot></div>
+    <div class="a-citrus citrus"><image-slot id="about-citrus" shape="rect" placeholder="Lemon"></image-slot></div>
+  </div>
+</section>
+
+<section class="section wrap">
+  <div class="prose">
+    <p class="lead-de">Hallo, ich bin die Person hinter Deutsch Entries.</p>
+    <p>This blog is a record of a small, stubborn project: learning German not as a task to be finished, but as a place to live in. I started with a phrasebook, a borrowed grammar, and a fierce love of three things that, for me, sit at the heart of European culture — the patient geometry of Persian rugs, the impossible stone of cathedrals, and the bright, defiant cheerfulness of a lemon in winter.</p>
+    <p>Each entry here is written in German, on purpose. At the beginning, the posts were four sentences long and full of mistakes. They still have mistakes — but now they are paragraphs, sometimes pages. You are watching a language arrive in real time. The interface stays in English so visitors can follow along; the writing stays in German so I keep growing.</p>
+    <h2>Why <em>German</em>, of all things?</h2>
+    <p>Because it has words for feelings I never had names for. Because the grammar is a puzzle that rewards patience, like weaving. And because somewhere along the way, between the umlauts and the long compound nouns, it stopped feeling foreign and started feeling like a second home I was slowly building, brick by careful brick.</p>
+  </div>
+</section>
+
+<section class="wrap" style="padding-bottom:clamp(40px,6vw,80px)">
+  <div class="diamond-rule" style="max-width:760px;margin:0 auto 40px"><span></span></div>
+  <h2 style="text-align:center;font-size:clamp(1.9rem,3.6vw,2.6rem);margin-bottom:8px">The journey, in <em style="font-style:italic;color:var(--rug)">milestones</em></h2>
+  <p style="text-align:center;color:var(--ink-soft);max-width:46ch;margin:0 auto 40px">From the first four sentences to the long winter essays — how the entries grew.</p>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-when">2025<small>Juli</small></div>
+      <div class="tl-body"><h4>Die ersten Wörter</h4><p>Vier Sätze, ein Wörterbuch, viel Mut. <span class="de">„Ich heiße… und ich lerne Deutsch.“</span></p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-when">2025<small>Oktober</small></div>
+      <div class="tl-body"><h4>Das erste echte Gespräch</h4><p>Drei Minuten ohne Übersetzen im Kopf. Ein kleines Wunder, das sich nach einem Marathon anfühlte.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-when">2026<small>Januar</small></div>
+      <div class="tl-body"><h4>Längere Einträge</h4><p>Die Posts werden zu kleinen Essays. Ich entdecke <span class="de">Nebensätze</span> — und verliebe mich in sie.</p></div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-when">2026<small>Juni</small></div>
+      <div class="tl-body"><h4>Niveau B1, und es geht weiter</h4><p>Mein längster Eintrag bis jetzt handelt von Zitronen. Es geht nie nur um Grammatik.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section wrap" style="padding-top:0">
+  <h2 style="font-size:clamp(1.7rem,3vw,2.3rem);margin-bottom:24px">What this diary is made of</h2>
+  <div class="values">
+    <div class="value"><div class="num">01</div><h4>Geduld · Patience</h4><p>Progress measured in entries, not exams. Slow is the whole point.</p></div>
+    <div class="value"><div class="num">02</div><h4>Kultur · Culture</h4><p>Rugs, cathedrals, citrus — language learned through the things I love.</p></div>
+    <div class="value"><div class="num">03</div><h4>Ehrlichkeit · Honesty</h4><p>Mistakes stay in. They're the most truthful part of the record.</p></div>
+  </div>
+</section>
+
+<section class="wrap" style="padding-bottom:clamp(40px,6vw,80px)">
+  <div class="cta-band">
+    <span class="eyebrow center" style="justify-content:center">Komm mit</span>
+    <h2 style="margin-top:14px">Read along from the <em>beginning</em></h2>
+    <p>Start with the first wobbly entries, or jump straight to the latest. Either way — willkommen.</p>
+    <a href="archive.html" class="btn btn-primary">Open the archive <span class="arrow">→</span></a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><h4>Deutsch <em>Entries</em></h4><p>A personal diary of learning German, one cultural detour at a time. Written in German, kept in English, dusted with lemon.</p></div>
+    <div><div class="col-title">Pages</div><div class="footer-links"><a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a></div></div>
+    <div><div class="col-title">Themen</div><div class="footer-links"><a href="archive.html">Sprache</a><a href="archive.html">Kultur</a><a href="archive.html">Reisen</a><a href="archive.html">Leben</a></div></div>
+  </div>
+  <div class="footer-base"><span>© 2026 Deutsch Entries — geschrieben mit Geduld.</span><span>Made with cream, carpets &amp; citrus.</span></div>
+</footer>
+
+<script src="image-slot.js"></script>
+<script src="site.js"></script>
+</body>
+</html>

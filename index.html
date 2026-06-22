@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deutsch Entries — A diary in a borrowed language</title>
+<link rel="stylesheet" href="site.css">
+<style>
+/* ---------- Home-specific ---------- */
+/* more breathing room on the sides */
+.wrap{ max-width:1140px; padding-left:clamp(28px,7vw,90px); padding-right:clamp(28px,7vw,90px); }
+.hero{ position:relative; padding:clamp(40px,6vw,80px) 0 clamp(30px,5vw,60px); overflow:hidden; }
+.hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(30px,5vw,70px); align-items:center; }
+.hero-copy h1{
+  font-size:clamp(3.2rem,8vw,6rem); line-height:.95; margin:18px 0 0;
+}
+.hero-copy h1 em{ font-style:italic; color:var(--rug); }
+.hero-copy .lede{
+  font-family:var(--serif); font-style:italic; font-size:clamp(1.25rem,2.4vw,1.7rem);
+  color:var(--ink-soft); margin:22px 0 0; max-width:24ch; line-height:1.35;
+}
+.hero-copy .intro{ margin:24px 0 30px; max-width:46ch; color:var(--ink-soft); }
+.hero-cta{ display:flex; gap:14px; flex-wrap:wrap; }
+
+/* collage */
+.collage{ position:relative; height:clamp(420px,46vw,560px); }
+.collage .c-arch{
+  position:absolute; top:0; right:6%; width:62%; height:88%;
+  box-shadow:var(--shadow);
+}
+.collage .c-round{
+  position:absolute; left:4%; bottom:6%; width:44%; aspect-ratio:1/1; z-index:3;
+  border:6px solid var(--paper); box-shadow:var(--shadow);
+}
+.collage .c-rug{
+  position:absolute; right:0; bottom:0; width:34%; aspect-ratio:4/3; z-index:2;
+  border:5px solid var(--paper); box-shadow:var(--shadow-soft); border-radius:6px; overflow:hidden;
+  transform:rotate(4deg);
+}
+.collage .c-citrus{ position:absolute; right:2%; top:-2%; z-index:4; }
+.collage .c-stamp{
+  position:absolute; left:6%; top:8%; z-index:4;
+  width:96px; height:96px; border-radius:50%;
+  background:var(--rug); color:var(--lemon-soft);
+  display:grid; place-items:center; text-align:center; transform:rotate(-12deg);
+  box-shadow:var(--shadow-soft);
+}
+.collage .c-stamp span{ font-family:var(--serif); font-style:italic; font-size:13px; line-height:1.2; letter-spacing:.04em; }
+
+.hero-strip{ display:flex; gap:28px; flex-wrap:wrap; margin-top:46px; padding-top:26px; border-top:1px solid var(--line); }
+.hero-strip .stat .n{ font-family:var(--serif); font-size:1.9rem; color:var(--rug); }
+.hero-strip .stat .l{ font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
+
+/* featured */
+.featured{ display:grid; grid-template-columns:1.15fr 1fr; gap:clamp(28px,4vw,56px); align-items:center; }
+.featured .f-img{ height:clamp(360px,40vw,500px); box-shadow:var(--shadow); }
+.featured .f-tag{ display:inline-flex; gap:10px; align-items:center; margin-bottom:18px; }
+.featured h2{ font-size:clamp(2.2rem,4.4vw,3.4rem); margin:0 0 18px; }
+.featured h2 em{ font-style:italic; color:var(--rug); }
+.featured .f-body{ color:var(--ink-soft); margin-bottom:22px; max-width:48ch; }
+.featured .f-de{ font-family:var(--serif); font-style:italic; color:var(--terracotta); margin-bottom:24px; font-size:1.05rem; }
+
+.grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(26px,3vw,42px); }
+.grid-3 .card:nth-child(1) .thumb{ height:320px; }
+.grid-3 .card .thumb{ height:260px; }
+
+/* author teaser */
+.author-strip{ background:var(--cream-deep); }
+.author-inner{ display:grid; grid-template-columns:auto 1fr; gap:clamp(28px,4vw,56px); align-items:center; padding-top:clamp(48px,7vw,80px); padding-bottom:clamp(48px,7vw,80px); }
+.author-portrait{ width:clamp(150px,18vw,210px); aspect-ratio:3/4; box-shadow:var(--shadow); }
+.author-inner blockquote{ margin:0; font-family:var(--serif); font-size:clamp(1.5rem,3vw,2.2rem); font-style:italic; line-height:1.3; max-width:22ch; }
+.author-inner blockquote .src{ display:block; font-family:var(--sans); font-style:normal; font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:var(--rug); margin-top:20px; }
+
+.mobile-menu{ display:none; }
+@media (max-width:960px){
+  .hero-grid{ grid-template-columns:1fr; }
+  .collage{ order:-1; height:clamp(360px,80vw,440px); }
+  .featured{ grid-template-columns:1fr; }
+  .featured .f-img{ height:300px; }
+  .grid-3{ grid-template-columns:repeat(2,1fr); }
+}
+@media (max-width:620px){
+  .grid-3{ grid-template-columns:1fr; }
+  .author-inner{ grid-template-columns:1fr; }
+  .mobile-menu.open{
+    display:flex; position:fixed; inset:0; z-index:100; background:rgba(43,33,26,.96);
+    flex-direction:column; align-items:center; justify-content:center; gap:28px;
+  }
+  .mobile-menu a{ color:var(--cream); font-family:var(--serif); font-size:1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <span class="mark">Deutsch <em>Entries</em></span>
+      <span class="dot"></span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="archive.html">Archive</a>
+      <a href="about.html">About</a>
+      <a href="archive.html#search" class="nav-search" aria-label="Search the archive">⌕</a>
+      <a href="login.html" class="nav-login">Login</a>
+    </nav>
+    <button class="nav-toggle">Menu</button>
+  </div>
+</header>
+<div class="mobile-menu">
+  <a href="index.html">Home</a>
+  <a href="archive.html">Archive</a>
+  <a href="about.html">About</a>
+  <a href="login.html">Login</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">A diary in a borrowed language · Est. 2025</span>
+      <h1>Deutsch<br><em>Entries</em></h1>
+      <p class="lede">Short reflections that grow longer as the words arrive.</p>
+      <p class="intro">A slow, romantic record of learning German — written in the language itself. It begins with three words and a dictionary, and turns, entry by entry, into something that almost sounds like home. Castles, carpets, and a stubborn love of lemons included.</p>
+      <div class="hero-cta">
+        <a href="archive.html" class="btn btn-primary">Read the latest <span class="arrow">→</span></a>
+        <a href="about.html" class="btn btn-ghost">The story</a>
+      </div>
+      <div class="hero-strip">
+        <div class="stat"><div class="n">38</div><div class="l">Entries</div></div>
+        <div class="stat"><div class="n">14</div><div class="l">Months in</div></div>
+        <div class="stat"><div class="n">B1</div><div class="l">…and climbing</div></div>
+      </div>
+    </div>
+
+    <div class="collage">
+      <div class="c-arch arch">
+        <image-slot id="hero-arch" shape="rect" placeholder="Cathedral spire / castle arch"></image-slot>
+      </div>
+      <div class="c-round round-img">
+        <image-slot id="hero-round" shape="rect" placeholder="Persian rug detail"></image-slot>
+      </div>
+      <div class="c-rug">
+        <image-slot id="hero-rug" shape="rect" placeholder="Stonework texture"></image-slot>
+      </div>
+      <div class="c-citrus citrus">
+        <image-slot id="hero-lemon" shape="rect" placeholder="Lemon"></image-slot>
+      </div>
+      <div class="c-stamp"><span>seit<br>2025</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURED ===== -->
+<section class="section wrap">
+  <div class="featured">
+    <a href="post.html" class="f-img arch" style="display:block">
+      <image-slot id="thumb-zitronen" shape="rect" placeholder="Lemons on a windowsill in winter"></image-slot>
+    </a>
+    <div>
+      <span class="f-tag eyebrow">Featured · Küche &amp; Kultur</span>
+      <h2>Der Geschmack von <em>Zitronen</em> im Winter</h2>
+      <p class="f-de serif-italic">„Im Dezember kaufe ich Zitronen, als wären sie kleine Sonnen für die Wohnung.“</p>
+      <p class="f-body">When the light goes thin and grey, the market still keeps one bright thing. This entry began as a single sentence about a fruit and became a small essay about longing, language, and the colour yellow — the longest thing I have ever written in German.</p>
+      <a href="post.html" class="btn btn-ghost">Read the entry <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RECENT ===== -->
+<section class="section wrap" style="padding-top:0">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Frisch aus der Feder</span>
+      <h2 style="margin-top:14px">Recent entries</h2>
+    </div>
+    <a href="archive.html" class="link">View the full archive →</a>
+  </div>
+
+  <div class="grid-3">
+    <a href="post.html" class="card">
+      <div class="thumb"><span class="cat">Reisen</span><image-slot id="thumb-kathedralen" shape="rect" placeholder="Gothic cathedral, vaulted stone"></image-slot></div>
+      <div class="meta"><span>2. Mai 2026</span>·<span class="de">7 Min.</span></div>
+      <h3>Kathedralen und das Schweigen aus Stein</h3>
+      <p class="excerpt">Über große Räume, in denen die eigene Sprache plötzlich sehr klein klingt — und das vollkommen in Ordnung ist.</p>
+      <span class="read">Weiterlesen →</span>
+    </a>
+
+    <a href="post.html" class="card">
+      <div class="thumb"><span class="cat">Kultur</span><image-slot id="thumb-teppich" shape="rect" placeholder="Persian rug pattern, close up"></image-slot></div>
+      <div class="meta"><span>18. März 2026</span>·<span class="de">5 Min.</span></div>
+      <h3>Wie ein Teppich eine Geschichte erzählt</h3>
+      <p class="excerpt">Jeder Knoten ein Wort, jedes Muster ein Satz. Eine Lektion über Geduld, die ich von einem alten Teppich gelernt habe.</p>
+      <span class="read">Weiterlesen →</span>
+    </a>
+
+    <a href="post.html" class="card">
+      <div class="thumb"><span class="cat">Leben</span><image-slot id="thumb-sonntage" shape="rect" placeholder="Quiet café table, Sunday light"></image-slot></div>
+      <div class="meta"><span>27. Januar 2026</span>·<span class="de">4 Min.</span></div>
+      <h3>Sonntage in der fremden Sprache</h3>
+      <p class="excerpt">Wie es sich anfühlt, einen ruhigen Tag in einer Sprache zu verbringen, die noch nicht ganz die eigene ist.</p>
+      <span class="read">Weiterlesen →</span>
+    </a>
+
+    <a href="post.html" class="card">
+      <div class="thumb"><span class="cat">Sprache</span><image-slot id="thumb-vokale" shape="rect" placeholder="Handwritten German notebook"></image-slot></div>
+      <div class="meta"><span>9. Dezember 2025</span>·<span class="de">3 Min.</span></div>
+      <h3>Über die Höflichkeit der Vokale</h3>
+      <p class="excerpt">Ä, ö, ü — die drei kleinen Punkte, die alles verändern. Ein kurzer Brief an die Umlaute.</p>
+      <span class="read">Weiterlesen →</span>
+    </a>
+
+    <a href="post.html" class="card">
+      <div class="thumb"><span class="cat">Sprache</span><image-slot id="thumb-gespraech" shape="rect" placeholder="Two coffee cups on a table"></image-slot></div>
+      <div class="meta"><span>21. Oktober 2025</span>·<span class="de">2 Min.</span></div>
+      <h3>Mein erstes ganzes Gespräch</h3>
+      <p class="excerpt">Drei Minuten lang habe ich nicht ans Übersetzen gedacht. Danach war ich erschöpft und sehr glücklich.</p>
+      <span class="read">Weiterlesen →</span>
+    </a>
+
+    <a href="post.html" class="card">
+      <div class="thumb"><span class="cat">Sprache</span><image-slot id="thumb-woerter" shape="rect" placeholder="Open dictionary page"></image-slot></div>
+      <div class="meta"><span>3. September 2025</span>·<span class="de">2 Min.</span></div>
+      <h3>Drei Wörter, die ich liebe</h3>
+      <p class="excerpt">Fernweh, Feierabend, Geborgenheit. Worte, für die mein Englisch keinen richtigen Platz hat.</p>
+      <span class="read">Weiterlesen →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ===== AUTHOR ===== -->
+<section class="author-strip">
+  <div class="wrap author-inner">
+    <div class="author-portrait frame tilt-l" style="padding:8px">
+      <image-slot id="author-portrait" shape="rect" placeholder="Author portrait"></image-slot>
+    </div>
+    <blockquote>
+      „Eine neue Sprache zu lernen heißt, ein zweites Mal Kind zu sein — nur höflicher.“
+      <span class="src">— from the About page</span>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <h4>Deutsch <em>Entries</em></h4>
+      <p>A personal diary of learning German, one cultural detour at a time. Written in German, kept in English, dusted with lemon.</p>
+    </div>
+    <div>
+      <div class="col-title">Pages</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="archive.html">Archive</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+      </div>
+    </div>
+    <div>
+      <div class="col-title">Themen</div>
+      <div class="footer-links">
+        <a href="archive.html">Sprache</a>
+        <a href="archive.html">Kultur</a>
+        <a href="archive.html">Reisen</a>
+        <a href="archive.html">Leben</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-base">
+    <span>© 2026 Deutsch Entries — geschrieben mit Geduld.</span>
+    <span>Made with cream, carpets &amp; citrus.</span>
+  </div>
+</footer>
+
+<script src="image-slot.js"></script>
+<script src="site.js"></script>
+</body>
+</html>

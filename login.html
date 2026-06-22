@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in — Deutsch Entries</title>
+<link rel="stylesheet" href="site.css">
+<style>
+body{ min-height:100vh; }
+.login-wrap{ display:grid; grid-template-columns:1fr 1fr; min-height:100vh; }
+
+/* left visual panel */
+.login-art{ position:relative; background:var(--rug); overflow:hidden; color:#F6E9CF; }
+.login-art .rug-band{ position:absolute; top:0; left:0; right:0; }
+.login-art .rug-band.b{ top:auto; bottom:0; }
+.login-art .art-inner{ position:relative; height:100%; display:flex; flex-direction:column; justify-content:center; padding:clamp(40px,6vw,80px); z-index:2; }
+.login-art .a-brand{ font-family:var(--serif); font-size:1.5rem; }
+.login-art .a-brand em{ font-style:italic; color:var(--lemon-soft); }
+.login-art h2{ color:#FBEFD9; font-size:clamp(2.2rem,4vw,3.4rem); line-height:1.05; margin:auto 0 18px; max-width:14ch; }
+.login-art h2 em{ font-style:italic; color:var(--lemon-soft); }
+.login-art .a-de{ font-family:var(--serif); font-style:italic; font-size:1.15rem; color:#EAD3B0; max-width:30ch; }
+.login-art .a-pics{ position:absolute; right:-40px; top:8%; width:240px; opacity:.9; }
+.login-art .a-arch{ position:absolute; right:-30px; bottom:14%; width:220px; height:260px; border:6px solid rgba(246,233,207,.25); border-radius:110px 110px 8px 8px; overflow:hidden; transform:rotate(4deg); }
+.login-art .a-arch image-slot{ width:100%; height:100%; }
+.login-art .a-citrus{ position:absolute; left:8%; bottom:16%; }
+
+/* right form panel */
+.login-form{ display:flex; flex-direction:column; justify-content:center; padding:clamp(40px,6vw,90px); position:relative; }
+.login-form .back{ position:absolute; top:30px; left:clamp(40px,6vw,90px); font-size:13px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); }
+.login-form .back:hover{ color:var(--rug); }
+.form-card{ max-width:380px; width:100%; margin:0 auto; }
+.form-card .eyebrow{ margin-bottom:14px; }
+.form-card h1{ font-size:clamp(2.2rem,4vw,3rem); }
+.form-card h1 em{ font-style:italic; color:var(--rug); }
+.form-card .sub{ color:var(--ink-soft); margin:10px 0 32px; }
+.field{ margin-bottom:18px; }
+.field label{ display:block; font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:8px; }
+.field input{
+  width:100%; padding:14px 16px; border-radius:10px; border:1.5px solid var(--line);
+  background:var(--paper); font-family:var(--sans); font-size:16px; color:var(--ink); transition:.2s;
+}
+.field input:focus{ outline:none; border-color:var(--rug); box-shadow:0 0 0 3px rgba(142,43,34,.12); }
+.row-between{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 26px; font-size:14px; }
+.remember{ display:flex; align-items:center; gap:8px; color:var(--ink-soft); }
+.remember input{ width:16px; height:16px; accent-color:var(--rug); }
+.forgot{ color:var(--rug); font-weight:500; }
+.btn-full{ width:100%; justify-content:center; }
+.login-note{ margin-top:26px; padding-top:22px; border-top:1px solid var(--line); font-size:13.5px; color:var(--ink-faint); text-align:center; }
+
+@media (max-width:880px){
+  .login-wrap{ grid-template-columns:1fr; }
+  .login-art{ min-height:240px; }
+  .login-art .a-arch, .login-art .a-citrus{ display:none; }
+  .login-art h2{ margin:0 0 14px; }
+}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+
+  <!-- visual panel -->
+  <div class="login-art">
+    <div class="art-inner">
+      <div class="a-brand">Deutsch <em>Entries</em></div>
+      <h2>Welcome back, <em>Schreiberin</em>.</h2>
+      <p class="a-de">„Die Tinte wartet schon. Zeit für einen neuen Eintrag.“</p>
+    </div>
+    <div class="a-arch"><image-slot id="login-arch" shape="rect" placeholder="Cathedral / castle"></image-slot></div>
+    <div class="a-citrus citrus"><image-slot id="login-citrus" shape="rect" placeholder="Lemon"></image-slot></div>
+  </div>
+
+  <!-- form panel -->
+  <div class="login-form">
+    <a href="index.html" class="back">← Back to the blog</a>
+    <div class="form-card">
+      <span class="eyebrow">Admin access</span>
+      <h1>Sign <em>in</em></h1>
+      <p class="sub">This diary has a single author. Sign in to write, edit, and publish new entries.</p>
+
+      <form onsubmit="window.location.href='admin.html';return false;">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="autorin@deutschentries.de" value="autorin@deutschentries.de">
+        </div>
+        <div class="field">
+          <label for="pw">Password</label>
+          <input id="pw" type="password" placeholder="••••••••••" value="passwort">
+        </div>
+        <div class="row-between">
+          <label class="remember"><input type="checkbox" checked> Keep me signed in</label>
+          <a href="#" class="forgot">Forgot?</a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Enter the studio <span class="arrow">→</span></button>
+      </form>
+
+      <p class="login-note">Single-author blog · no public registration. <br>Demo only — any details will take you in.</p>
+    </div>
+  </div>
+
+</div>
+<script src="image-slot.js"></script>
+</body>
+</html>

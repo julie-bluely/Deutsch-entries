@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seite nicht gefunden — Deutsch Entries</title>
+<link rel="stylesheet" href="site.css">
+<style>
+.nf-wrap{ min-height:calc(100vh - 78px); display:grid; grid-template-columns:1.05fr .95fr; align-items:center; gap:clamp(32px,5vw,72px); }
+.nf-copy .big{ font-family:var(--serif); font-weight:600; font-size:clamp(5rem,16vw,11rem); line-height:.9; color:var(--rug); letter-spacing:-.02em; }
+.nf-copy .big em{ font-style:italic; color:var(--terracotta); }
+.nf-copy h1{ font-size:clamp(1.8rem,3.4vw,2.6rem); margin:18px 0 0; }
+.nf-copy .de{ font-family:var(--serif); font-style:italic; color:var(--terracotta); font-size:clamp(1.1rem,2.2vw,1.4rem); margin:18px 0 0; max-width:34ch; line-height:1.4; }
+.nf-copy p.en{ color:var(--ink-soft); max-width:42ch; margin:14px 0 0; line-height:1.6; }
+.nf-actions{ display:flex; gap:14px; flex-wrap:wrap; margin-top:30px; }
+.nf-collage{ position:relative; height:clamp(360px,44vw,520px); }
+.nf-collage .c-arch{ position:absolute; right:2%; top:2%; width:64%; height:92%; box-shadow:var(--shadow); }
+.nf-collage .c-rug{ position:absolute; left:0; bottom:6%; width:48%; aspect-ratio:4/3; border:5px solid var(--paper); box-shadow:var(--shadow); border-radius:6px; overflow:hidden; transform:rotate(-5deg); z-index:2; }
+.nf-collage .c-citrus{ position:absolute; left:34%; top:-3%; z-index:3; }
+.nf-collage image-slot{ width:100%; height:100%; }
+.mobile-menu{ display:none; }
+@media (max-width:860px){
+  .nf-wrap{ grid-template-columns:1fr; padding-top:40px; padding-bottom:60px; min-height:auto; }
+  .nf-collage{ order:-1; height:320px; }
+}
+@media (max-width:620px){
+  .mobile-menu.open{ display:flex; position:fixed; inset:0; z-index:100; background:rgba(43,33,26,.96); flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+  .mobile-menu a{ color:var(--cream); font-family:var(--serif); font-size:1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">Deutsch <em>Entries</em></span><span class="dot"></span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="archive.html">Archive</a>
+      <a href="about.html">About</a>
+      <a href="archive.html#search" class="nav-search" aria-label="Search the archive">⌕</a>
+      <a href="login.html" class="nav-login">Login</a>
+    </nav>
+    <button class="nav-toggle">Menu</button>
+  </div>
+</header>
+<div class="mobile-menu">
+  <a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a>
+</div>
+
+<section class="wrap nf-wrap">
+  <div class="nf-copy">
+    <span class="eyebrow">Fehler 404</span>
+    <div class="big">4<em>0</em>4</div>
+    <h1>Diese Seite ist verschwunden</h1>
+    <p class="de">„Manchmal verläuft man sich — in einer Stadt, in einer Sprache, auf einer Website.“</p>
+    <p class="en">The page you're looking for has wandered off, like a word you almost remember. Let's get you back to something you can read.</p>
+    <div class="nf-actions">
+      <a href="index.html" class="btn btn-primary">Back home <span class="arrow">→</span></a>
+      <a href="archive.html#search" class="btn btn-ghost">Search the archive</a>
+    </div>
+  </div>
+  <div class="nf-collage">
+    <div class="c-arch arch"><image-slot id="nf-arch" shape="rect" placeholder="Cathedral arch / stonework"></image-slot></div>
+    <div class="c-rug"><image-slot id="nf-rug" shape="rect" placeholder="Persian rug corner"></image-slot></div>
+    <div class="c-citrus citrus"><image-slot id="nf-citrus" shape="rect" placeholder="Lemon"></image-slot></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><h4>Deutsch <em>Entries</em></h4><p>A personal diary of learning German, one cultural detour at a time. Written in German, kept in English, dusted with lemon.</p></div>
+    <div><div class="col-title">Pages</div><div class="footer-links"><a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a></div></div>
+    <div><div class="col-title">Themen</div><div class="footer-links"><a href="archive.html">Sprache</a><a href="archive.html">Kultur</a><a href="archive.html">Reisen</a><a href="archive.html">Leben</a></div></div>
+  </div>
+  <div class="footer-base"><span>© 2026 Deutsch Entries — geschrieben mit Geduld.</span><span>Made with cream, carpets &amp; citrus.</span></div>
+</footer>
+
+<script src="image-slot.js"></script>
+<script src="site.js"></script>
+</body>
+</html>

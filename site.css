@@ -1,0 +1,253 @@
+/* ============================================================
+   Deutsch Entries — shared editorial stylesheet
+   "Pinteresty cultural editorial chic"
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root{
+  /* warm cream / beige ground */
+  --cream:      #F3EADB;
+  --cream-deep: #ECE0CB;
+  --paper:      #FBF6EC;
+  --paper-edge: #E7DAC2;
+
+  /* warm ink */
+  --ink:       #2B211A;
+  --ink-soft:  #5E5042;
+  --ink-faint: #8A7B68;
+
+  /* Persian-rug reds & terracotta */
+  --rug:        #8E2B22;
+  --rug-deep:   #6C1E18;
+  --terracotta: #BD6A42;
+  --terra-soft: #D89469;
+
+  /* citrus accent — used sparingly */
+  --lemon:      #DDA52C;
+  --lemon-soft: #ECC96B;
+
+  --line:      rgba(43,33,26,.14);
+  --line-soft: rgba(43,33,26,.08);
+
+  --shadow: 0 18px 40px -22px rgba(60,30,20,.45);
+  --shadow-soft: 0 10px 26px -18px rgba(60,30,20,.40);
+
+  --maxw: 1240px;
+  --serif: 'Playfair Display', Georgia, 'Times New Roman', serif; /* @kind font */
+  --sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif; /* @kind font */
+}
+
+*{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body{
+  margin:0;
+  background:var(--cream);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.65;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+
+h1,h2,h3,h4{ font-family:var(--serif); font-weight:600; line-height:1.08; margin:0; letter-spacing:-.01em; }
+p{ margin:0 0 1.1em; }
+
+::selection{ background:var(--lemon-soft); color:var(--ink); }
+
+/* ---- layout helpers ---- */
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 clamp(28px,5vw,64px); }
+.eyebrow{
+  font-family:var(--sans); font-weight:600; font-size:12px;
+  letter-spacing:.26em; text-transform:uppercase; color:var(--rug);
+  display:inline-flex; align-items:center; gap:10px;
+}
+.eyebrow::before{ content:""; width:26px; height:1.5px; background:var(--rug); display:inline-block; }
+.eyebrow.center::before{ display:none; }
+
+.label{
+  font-family:var(--sans); font-weight:600; font-size:11px;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--ink-faint);
+}
+
+.serif-italic{ font-family:var(--serif); font-style:italic; font-weight:500; }
+
+/* ============================================================
+   Kilim / Persian rug decorative band
+   ============================================================ */
+.rug-band{
+  height:18px;
+  background-color:var(--rug);
+  background-image:
+    repeating-linear-gradient(45deg,  var(--lemon-soft) 0 1.5px, transparent 1.5px 13px),
+    repeating-linear-gradient(-45deg, var(--lemon-soft) 0 1.5px, transparent 1.5px 13px),
+    repeating-linear-gradient(45deg,  rgba(0,0,0,.18) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(-45deg, rgba(0,0,0,.18) 0 1px, transparent 1px 26px);
+  border-top:2px solid var(--rug-deep);
+  border-bottom:2px solid var(--rug-deep);
+}
+.rug-band.tall{ height:26px; }
+
+/* small diamond divider */
+.diamond-rule{
+  display:flex; align-items:center; gap:14px; color:var(--terracotta);
+  font-size:13px; letter-spacing:.3em;
+}
+.diamond-rule::before,.diamond-rule::after{
+  content:""; height:1px; flex:1; background:var(--line);
+}
+.diamond-rule span{ width:7px; height:7px; transform:rotate(45deg); background:var(--rug); }
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+.nav{
+  position:sticky; top:0; z-index:50;
+  background:rgba(243,234,219,.82);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{
+  max-width:var(--maxw); margin:0 auto;
+  padding:14px clamp(20px,5vw,56px);
+  display:flex; align-items:center; justify-content:space-between; gap:24px;
+}
+.brand{ display:flex; align-items:baseline; gap:10px; }
+.brand .mark{
+  font-family:var(--serif); font-weight:700; font-size:24px; letter-spacing:-.02em;
+}
+.brand .mark em{ font-style:italic; color:var(--rug); }
+.brand .dot{ width:6px; height:6px; background:var(--lemon); border-radius:50%; transform:translateY(-2px); }
+.nav-links{ display:flex; align-items:center; gap:30px; }
+.nav-links a{
+  font-size:13px; font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--ink-soft); position:relative; padding:4px 0;
+}
+.nav-links a:hover{ color:var(--ink); }
+.nav-links a.active{ color:var(--rug); }
+.nav-links a.active::after{
+  content:""; position:absolute; left:0; right:0; bottom:-2px; height:2px; background:var(--rug);
+}
+.nav-login{
+  display:inline-flex; align-items:center; gap:8px;
+  border:1.5px solid var(--ink); color:var(--ink);
+  padding:8px 16px; border-radius:999px; font-size:12px; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase; transition:.2s;
+}
+.nav-login:hover{ background:var(--ink); color:var(--cream); }
+.nav-search{ font-size:17px !important; letter-spacing:0 !important; line-height:1; padding:4px 2px !important; color:var(--ink-soft); }
+.nav-search:hover{ color:var(--rug); }
+.nav-toggle{ display:none; }
+
+@media (max-width:880px){
+  .nav-links{ display:none; }
+  .nav-toggle{
+    display:inline-flex; border:1.5px solid var(--ink); border-radius:999px;
+    padding:8px 14px; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+  }
+}
+
+/* ============================================================
+   Collage image frames
+   ============================================================ */
+.arch{ border-radius:50% 50% 6px 6px / 42% 42% 6px 6px; overflow:hidden; }
+.arch image-slot{ width:100%; height:100%; }
+.frame{
+  background:var(--paper); padding:10px; box-shadow:var(--shadow);
+  border:1px solid var(--paper-edge);
+}
+.frame.tilt-l{ transform:rotate(-3deg); }
+.frame.tilt-r{ transform:rotate(3deg); }
+.round-img{ border-radius:50%; overflow:hidden; }
+
+/* citrus dot accent */
+.citrus{
+  width:74px; height:74px; border-radius:50%; overflow:hidden;
+  box-shadow:0 8px 20px -10px rgba(120,80,10,.6);
+  border:3px solid var(--paper);
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn{
+  display:inline-flex; align-items:center; gap:10px;
+  font-family:var(--sans); font-weight:600; font-size:13px;
+  letter-spacing:.1em; text-transform:uppercase; cursor:pointer;
+  padding:13px 24px; border-radius:999px; border:1.5px solid transparent; transition:.2s;
+}
+.btn-primary{ background:var(--rug); color:#FBEFD9; }
+.btn-primary:hover{ background:var(--rug-deep); }
+.btn-ghost{ background:transparent; border-color:var(--ink); color:var(--ink); }
+.btn-ghost:hover{ background:var(--ink); color:var(--cream); }
+.btn .arrow{ transition:transform .2s; }
+.btn:hover .arrow{ transform:translateX(4px); }
+
+/* ============================================================
+   Post cards
+   ============================================================ */
+.card{
+  display:flex; flex-direction:column; cursor:pointer;
+  text-decoration:none; color:inherit;
+}
+.card .thumb{
+  position:relative; overflow:hidden; border-radius:10px;
+  background:var(--cream-deep); box-shadow:var(--shadow-soft);
+  border:1px solid var(--paper-edge);
+}
+.card .thumb image-slot{ width:100%; height:100%; transition:transform .6s ease; }
+.card:hover .thumb image-slot{ transform:scale(1.04); }
+.card .cat{
+  position:absolute; top:12px; left:12px; z-index:2;
+  background:var(--cream); color:var(--rug);
+  font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  padding:5px 11px; border-radius:999px;
+}
+.card .meta{ display:flex; gap:10px; align-items:center; margin:14px 0 6px; color:var(--ink-faint); font-size:12.5px; letter-spacing:.06em; }
+.card .meta .de{ color:var(--terracotta); font-weight:600; }
+.card h3{ font-size:1.32rem; margin-bottom:.35em; }
+.card:hover h3{ color:var(--rug); }
+.card .excerpt{ color:var(--ink-soft); font-size:15px; line-height:1.6; margin:0; }
+.card .read{ margin-top:12px; font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--rug); }
+
+/* ============================================================
+   Footer
+   ============================================================ */
+.footer{ background:var(--ink); color:#E9DCC8; margin-top:90px; }
+.footer .rug-band{ border-top:none; }
+.footer-inner{
+  max-width:var(--maxw); margin:0 auto; padding:60px clamp(20px,5vw,56px) 40px;
+  display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:40px;
+}
+.footer h4{ color:#F4ECDD; font-size:1.7rem; margin-bottom:12px; }
+.footer h4 em{ color:var(--terra-soft); font-style:italic; }
+.footer p{ color:#C7B79E; font-size:15px; max-width:34ch; }
+.footer .col-title{ font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--lemon-soft); margin-bottom:16px; }
+.footer-links{ display:flex; flex-direction:column; gap:10px; }
+.footer-links a{ color:#D9CAB2; font-size:14.5px; }
+.footer-links a:hover{ color:#fff; }
+.footer-base{
+  border-top:1px solid rgba(255,255,255,.12); padding:18px clamp(20px,5vw,56px);
+  max-width:var(--maxw); margin:0 auto; display:flex; justify-content:space-between;
+  color:#A8977C; font-size:12.5px; letter-spacing:.06em;
+}
+@media (max-width:760px){
+  .footer-inner{ grid-template-columns:1fr 1fr; }
+  .footer-base{ flex-direction:column; gap:8px; }
+}
+
+/* shared section spacing */
+.section{ padding-top:clamp(56px,8vw,96px); padding-bottom:clamp(56px,8vw,96px); }
+.section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:38px; flex-wrap:wrap; }
+.section-head h2{ font-size:clamp(2rem,4.4vw,3rem); }
+.section-head .link{ font-size:13px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--rug); white-space:nowrap; }
+
+/* slot caption helper for empty drop zones */
+image-slot{ font-family:var(--sans) !important; }

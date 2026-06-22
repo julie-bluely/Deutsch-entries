@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio — Deutsch Entries</title>
+<link rel="stylesheet" href="site.css">
+<style>
+body{ background:var(--cream-deep); }
+.admin{ display:grid; grid-template-columns:248px 1fr; min-height:100vh; }
+
+/* sidebar */
+.side{ background:var(--ink); color:#E4D6C0; display:flex; flex-direction:column; padding:26px 18px; position:sticky; top:0; height:100vh; }
+.side .s-brand{ font-family:var(--serif); font-size:1.4rem; color:#F4ECDD; padding:0 12px 22px; border-bottom:1px solid rgba(255,255,255,.1); }
+.side .s-brand em{ font-style:italic; color:var(--lemon-soft); }
+.side nav{ display:flex; flex-direction:column; gap:4px; margin-top:18px; }
+.side nav button{
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  background:transparent; border:none; color:#C9B89D; font-family:var(--sans);
+  font-size:14.5px; font-weight:500; padding:11px 12px; border-radius:9px; cursor:pointer; transition:.16s;
+}
+.side nav button:hover{ background:rgba(255,255,255,.06); color:#fff; }
+.side nav button.active{ background:var(--rug); color:#FBEFD9; }
+.side nav button .ic{ width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; opacity:.9; flex:none; }
+.side .s-foot a .ic{ width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; flex:none; }
+.side .s-foot{ margin-top:auto; border-top:1px solid rgba(255,255,255,.1); padding-top:16px; display:flex; flex-direction:column; gap:4px; }
+.side .s-foot a{ display:flex; align-items:center; gap:12px; color:#B6A488; font-size:14px; padding:10px 12px; border-radius:9px; }
+.side .s-foot a:hover{ background:rgba(255,255,255,.06); color:#fff; }
+
+/* main */
+.main{ padding:0; overflow:auto; }
+.topbar{ display:flex; align-items:center; justify-content:space-between; padding:20px clamp(24px,3vw,44px); background:var(--cream); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10; }
+.topbar h1{ font-size:1.7rem; }
+.topbar h1 em{ font-style:italic; color:var(--rug); }
+.topbar .t-actions{ display:flex; gap:12px; align-items:center; }
+.user-pill{ display:flex; align-items:center; gap:10px; font-size:13px; color:var(--ink-soft); }
+.user-pill .av{ width:34px; height:34px; border-radius:50%; overflow:hidden; }
+.user-pill .av image-slot{ width:100%; height:100%; }
+.panel{ padding:clamp(24px,3vw,44px); }
+[hidden]{ display:none !important; }
+
+/* dashboard stats */
+.stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; margin-bottom:34px; }
+.stat-card{ background:var(--paper); border:1px solid var(--paper-edge); border-radius:14px; padding:22px 24px; }
+.stat-card .n{ font-family:var(--serif); font-size:2.3rem; color:var(--rug); line-height:1; }
+.stat-card .l{ font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); margin-top:8px; }
+.stat-card .d{ font-size:12.5px; color:var(--terracotta); margin-top:6px; }
+
+.panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.panel-head h2{ font-size:1.5rem; }
+.panel-head .sub{ font-size:13.5px; color:var(--ink-faint); }
+.filter-tabs{ display:flex; gap:6px; background:var(--cream-deep); padding:4px; border-radius:999px; }
+.filter-tabs .ftab{ border:none; background:transparent; font-family:var(--sans); font-size:13px; font-weight:600; color:var(--ink-soft); padding:7px 16px; border-radius:999px; cursor:pointer; transition:.15s; }
+.filter-tabs .ftab:hover{ color:var(--ink); }
+.filter-tabs .ftab.active{ background:var(--paper); color:var(--rug); box-shadow:var(--shadow-soft); }
+.posts-empty{ padding:48px 22px; text-align:center; color:var(--ink-faint); }
+.posts-empty .pe-mark{ font-size:32px; color:var(--terra-soft); }
+.posts-empty p{ margin-top:8px; font-size:14.5px; }
+
+/* settings */
+.set-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.set-box{ background:var(--paper); border:1px solid var(--paper-edge); border-radius:14px; padding:26px; }
+.set-box.full{ grid-column:1/-1; }
+.set-box h3{ font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); font-family:var(--sans); font-weight:600; margin-bottom:6px; }
+.set-box .h-sub{ font-size:13px; color:var(--ink-faint); margin-bottom:18px; }
+.field{ margin-bottom:16px; }
+.field:last-child{ margin-bottom:0; }
+.field label{ display:block; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:7px; }
+.field input, .field textarea, .field select{ width:100%; border:1.5px solid var(--line); border-radius:10px; background:var(--cream); padding:11px 13px; font-family:var(--sans); font-size:15px; color:var(--ink); outline:none; }
+.field textarea{ resize:vertical; line-height:1.6; }
+.field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--terra-soft); }
+.set-hero{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.set-hero .sh-slot{ height:130px; border:2px dashed var(--terra-soft); border-radius:12px; overflow:hidden; background:var(--cream); }
+.set-hero .sh-slot image-slot{ width:100%; height:100%; }
+.set-hero .sh-cap{ font-size:12px; color:var(--ink-faint); margin-top:8px; text-align:center; }
+.set-portrait{ display:flex; align-items:center; gap:18px; }
+.set-portrait .sp-img{ width:84px; height:84px; border-radius:50%; overflow:hidden; flex:none; box-shadow:var(--shadow-soft); }
+.set-portrait .sp-img image-slot{ width:100%; height:100%; }
+.set-save{ display:flex; justify-content:flex-end; gap:12px; margin-top:24px; }
+
+/* preview modal */
+.preview-veil{ position:fixed; inset:0; background:rgba(43,33,26,.55); backdrop-filter:blur(2px); z-index:120; display:flex; align-items:flex-start; justify-content:center; padding:40px 24px; overflow:auto; }
+.preview-card{ background:var(--cream); border-radius:16px; max-width:760px; width:100%; box-shadow:0 30px 70px rgba(0,0,0,.35); overflow:hidden; }
+.preview-bar{ display:flex; align-items:center; justify-content:space-between; padding:14px 22px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--cream); }
+.preview-bar .pv-tag{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; }
+.preview-bar .pv-close{ background:none; border:none; font-size:22px; color:var(--ink-soft); cursor:pointer; line-height:1; }
+.preview-body{ padding:clamp(28px,4vw,52px); }
+.preview-body .pv-cats{ display:flex; gap:8px; margin-bottom:16px; }
+.preview-body .pv-cats span{ background:var(--cream-deep); color:var(--rug); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; padding:5px 12px; border-radius:999px; }
+.preview-body h1{ font-family:var(--serif); font-size:clamp(2rem,4vw,3rem); line-height:1.05; color:var(--ink); }
+.preview-body .pv-date{ color:var(--ink-faint); font-size:13.5px; margin:14px 0 22px; }
+.preview-body .pv-hero{ height:300px; border-radius:12px; overflow:hidden; margin-bottom:26px; box-shadow:var(--shadow-soft); }
+.preview-body .pv-hero image-slot{ width:100%; height:100%; }
+.preview-body .pv-text{ font-size:17px; line-height:1.8; color:#34291f; white-space:pre-wrap; }
+
+/* schedule control */
+.sched-toggle{ display:flex; align-items:center; gap:10px; margin-top:6px; font-size:14px; color:var(--ink-soft); cursor:pointer; }
+.sched-field{ margin-top:12px; }
+.sched-field input{ width:100%; border:1.5px solid var(--line); border-radius:9px; background:var(--cream); padding:9px 12px; font-family:var(--sans); font-size:14px; color:var(--ink); outline:none; }
+
+/* posts table */
+.posts{ background:var(--paper); border:1px solid var(--paper-edge); border-radius:14px; overflow:hidden; }
+.post-row{ display:grid; grid-template-columns:64px 1fr 130px 110px 120px; gap:18px; align-items:center; padding:14px 22px; border-bottom:1px solid var(--line-soft); transition:.15s; }
+.post-row:last-child{ border-bottom:none; }
+.post-row:hover{ background:var(--cream); }
+.post-row.head{ background:var(--cream-deep); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:600; }
+.post-row .pr-thumb{ width:64px; height:48px; border-radius:8px; overflow:hidden; background:var(--cream-deep); display:flex; align-items:center; justify-content:center; color:var(--terra-soft); }
+.post-row .pr-thumb svg{ width:20px; height:20px; opacity:.55; }
+.post-row .pr-title{ font-family:var(--serif); font-size:1.05rem; }
+.post-row .pr-cat{ font-size:12px; color:var(--ink-faint); margin-top:2px; }
+.badge{ font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; padding:5px 11px; border-radius:999px; display:inline-block; }
+.badge.pub{ background:rgba(111,106,58,.16); color:#5c5a2a; }
+.badge.draft{ background:rgba(189,106,66,.16); color:var(--terracotta); }
+.pr-date{ font-size:13.5px; color:var(--ink-soft); }
+.pr-edit{ font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); cursor:pointer; background:none; border:none; font-family:var(--sans); padding:0; transition:.15s; }
+.pr-edit:hover{ color:var(--rug); }
+.pr-actions{ display:flex; gap:14px; align-items:center; justify-content:flex-end; }
+.pr-del{ font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); cursor:pointer; background:none; border:none; font-family:var(--sans); padding:0; transition:.15s; }
+.pr-del:hover{ color:#a3322a; }
+.post-row.removing{ opacity:0; transform:translateX(12px); }
+
+/* confirm modal */
+.modal-veil{ position:fixed; inset:0; background:rgba(43,33,26,.5); backdrop-filter:blur(2px); display:flex; align-items:center; justify-content:center; z-index:100; padding:24px; }
+.modal{ background:var(--cream); border-radius:16px; padding:30px 32px; max-width:420px; width:100%; box-shadow:0 24px 60px rgba(0,0,0,.3); }
+.modal h3{ font-family:var(--serif); font-size:1.6rem; margin-bottom:10px; }
+.modal h3 em{ font-style:italic; color:var(--rug); }
+.modal p{ font-size:14.5px; color:var(--ink-soft); line-height:1.6; margin-bottom:24px; }
+.modal p strong{ color:var(--ink); }
+.modal-actions{ display:flex; gap:12px; justify-content:flex-end; }
+.btn-danger{ background:#a3322a; color:#FBEFD9; border:none; padding:11px 20px; border-radius:999px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer; }
+.btn-danger:hover{ background:#8c281f; }
+
+/* ===== editor ===== */
+.editor{ display:grid; grid-template-columns:1fr 320px; gap:26px; align-items:start; }
+.ed-main{ background:var(--paper); border:1px solid var(--paper-edge); border-radius:14px; padding:clamp(24px,3vw,40px); }
+.ed-title{ width:100%; border:none; background:transparent; font-family:var(--serif); font-weight:600; font-size:clamp(1.8rem,3.4vw,2.6rem); color:var(--ink); outline:none; line-height:1.1; }
+.ed-title::placeholder{ color:var(--ink-faint); opacity:.5; }
+.ed-meta-row{ display:flex; gap:12px; align-items:center; margin:14px 0 22px; padding-bottom:22px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+.ed-cat{ padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--cream); font-family:var(--sans); font-size:13px; color:var(--ink); }
+.ed-de-flag{ font-size:12px; color:var(--terracotta); font-weight:600; letter-spacing:.06em; display:flex; align-items:center; gap:6px; }
+.ed-label{ font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px; }
+.ed-excerpt{ width:100%; border:1.5px solid var(--line); border-radius:10px; background:var(--cream); padding:12px 14px; font-family:var(--sans); font-size:15px; color:var(--ink); resize:vertical; outline:none; margin-bottom:22px; }
+.ed-toolbar{ display:flex; gap:4px; margin-bottom:10px; border:1px solid var(--line); border-radius:9px; padding:5px; background:var(--cream); width:max-content; }
+.ed-toolbar button{ width:34px; height:30px; border:none; background:transparent; border-radius:6px; cursor:pointer; font-family:var(--serif); font-size:15px; color:var(--ink-soft); }
+.ed-toolbar button:hover{ background:var(--paper); color:var(--ink); }
+.ed-body{ width:100%; min-height:420px; border:1.5px solid var(--line); border-radius:10px; background:var(--cream); padding:18px 20px; font-family:var(--sans); font-size:16.5px; line-height:1.7; color:#34291f; resize:vertical; outline:none; }
+.ed-body:focus, .ed-excerpt:focus, .ed-title:focus{ }
+
+/* editor side rail */
+.rail{ display:flex; flex-direction:column; gap:18px; position:sticky; top:88px; }
+.rail-box{ background:var(--paper); border:1px solid var(--paper-edge); border-radius:14px; padding:20px; }
+.rail-box h3{ font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft); font-family:var(--sans); font-weight:600; margin-bottom:16px; }
+.pub-line{ display:flex; align-items:center; justify-content:space-between; font-size:14px; padding:8px 0; color:var(--ink-soft); }
+.pub-line strong{ color:var(--ink); font-weight:600; }
+.seg{ display:inline-flex; border:1.5px solid var(--line); border-radius:999px; overflow:hidden; }
+.seg button{ border:none; background:transparent; padding:6px 14px; font-family:var(--sans); font-size:12.5px; font-weight:600; cursor:pointer; color:var(--ink-soft); }
+.seg button.on{ background:var(--rug); color:#FBEFD9; }
+.pub-actions{ display:flex; flex-direction:column; gap:10px; margin-top:16px; }
+.pub-actions .btn{ width:100%; justify-content:center; }
+
+/* image upload */
+.dropzone{ border:2px dashed var(--terra-soft); border-radius:12px; overflow:hidden; height:170px; background:var(--cream); position:relative; }
+.dropzone image-slot{ width:100%; height:100%; }
+.thumb-toggle{ display:flex; align-items:center; gap:10px; margin-top:14px; font-size:14px; color:var(--ink-soft); cursor:pointer; }
+.switch{ width:42px; height:24px; border-radius:999px; background:var(--line); position:relative; transition:.2s; flex:none; }
+.switch::after{ content:""; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:var(--paper); box-shadow:0 1px 3px rgba(0,0,0,.25); transition:.2s; }
+.switch.on{ background:var(--rug); }
+.switch.on::after{ left:21px; }
+.upload-hint{ font-size:12px; color:var(--ink-faint); margin-top:12px; line-height:1.5; }
+.tag-input{ width:100%; border:1.5px solid var(--line); border-radius:9px; background:var(--cream); padding:10px 12px; font-family:var(--sans); font-size:14px; outline:none; }
+.tag-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+.tag-chips span{ background:var(--cream-deep); color:var(--ink-soft); font-size:12.5px; padding:5px 12px; border-radius:999px; }
+
+.mobile-warn{ display:none; }
+@media (max-width:1024px){ .stats{ grid-template-columns:repeat(2,1fr); } .editor{ grid-template-columns:1fr; } .rail{ position:static; } }
+@media (max-width:760px){
+  .admin{ grid-template-columns:1fr; }
+  .side{ position:static; height:auto; flex-direction:row; flex-wrap:wrap; align-items:center; padding:14px; }
+  .side .s-brand{ border:none; padding:0 8px 0 4px; }
+  .side nav{ flex-direction:row; margin:0; flex-wrap:wrap; }
+  .side .s-foot{ margin:0 0 0 auto; border:none; padding:0; flex-direction:row; }
+  .post-row{ grid-template-columns:48px 1fr 80px; }
+  .post-row .pr-date, .post-row .pr-cat-col{ display:none; }
+}
+</style>
+</head>
+<body>
+<div class="admin">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="side">
+    <div class="s-brand">Deutsch <em>Entries</em></div>
+    <nav>
+      <button data-view="dash" class="active" onclick="showView('dash',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></span> Dashboard</button>
+      <button data-view="write" onclick="showView('write',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></span> New entry</button>
+      <button data-view="dash" onclick="showView('dash',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="3.8" cy="6" r="1"></circle><circle cx="3.8" cy="12" r="1"></circle><circle cx="3.8" cy="18" r="1"></circle></svg></span> All entries</button>
+      <button onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="m21 16-5-5L5 20"></path></svg></span> Media</button>
+      <button data-view="settings" onclick="showView('settings',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></span> Settings</button>
+    </nav>
+    <div class="s-foot">
+      <a href="index.html"><span class="ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg></span> View the blog</a>
+      <a href="login.html"><span class="ic"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="m16 17 5-5-5-5"></path><line x1="21" y1="12" x2="9" y2="12"></line></svg></span> Sign out</a>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dash">
+      <div class="topbar">
+        <h1>Guten Tag, <em>Autorin</em></h1>
+        <div class="t-actions">
+          <button class="btn btn-primary" onclick="showView('write')">+ New entry</button>
+          <div class="user-pill"><span class="av"><image-slot id="author-portrait" shape="rect" placeholder="You"></image-slot></span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="stats">
+          <div class="stat-card"><div class="n">38</div><div class="l">Published</div><div class="d">+3 this month</div></div>
+          <div class="stat-card"><div class="n">2</div><div class="l">Drafts</div><div class="d">1 ready to review</div></div>
+          <div class="stat-card"><div class="n">B1</div><div class="l">Current level</div><div class="d">↑ from A2</div></div>
+          <div class="stat-card"><div class="n">1.4k</div><div class="l">Reads / month</div><div class="d">+12%</div></div>
+        </div>
+
+        <div class="panel-head">
+          <div><h2>Your entries</h2></div>
+          <div class="filter-tabs">
+            <button class="ftab active" data-status="all" onclick="filterPosts('all',this)">All</button>
+            <button class="ftab" data-status="pub" onclick="filterPosts('pub',this)">Published</button>
+            <button class="ftab" data-status="draft" onclick="filterPosts('draft',this)">Drafts</button>
+          </div>
+        </div>
+
+        <div class="posts">
+          <div class="post-row head">
+            <span></span><span>Title</span><span class="pr-cat-col">Status</span><span class="pr-date">Date</span><span></span>
+          </div>
+
+          <div class="post-row" data-status="pub">
+            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
+            <div><div class="pr-title">Der Geschmack von Zitronen im Winter</div><div class="pr-cat">Küche · Kultur</div></div>
+            <span><span class="badge pub">Published</span></span>
+            <span class="pr-date">14. Juni 2026</span>
+            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Der Geschmack von Zitronen im Winter')">Delete</button></div>
+          </div>
+
+          <div class="post-row" data-status="pub">
+            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
+            <div><div class="pr-title">Kathedralen und das Schweigen aus Stein</div><div class="pr-cat">Reisen</div></div>
+            <span><span class="badge pub">Published</span></span>
+            <span class="pr-date">2. Mai 2026</span>
+            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Kathedralen und das Schweigen aus Stein')">Delete</button></div>
+          </div>
+
+          <div class="post-row" data-status="draft">
+            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
+            <div><div class="pr-title">Frühling, oder: zu viele neue Wörter</div><div class="pr-cat">Leben</div></div>
+            <span><span class="badge draft">Draft</span></span>
+            <span class="pr-date">—</span>
+            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Frühling, oder: zu viele neue Wörter')">Delete</button></div>
+          </div>
+
+          <div class="post-row" data-status="pub">
+            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
+            <div><div class="pr-title">Wie ein Teppich eine Geschichte erzählt</div><div class="pr-cat">Kultur</div></div>
+            <span><span class="badge pub">Published</span></span>
+            <span class="pr-date">18. März 2026</span>
+            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Wie ein Teppich eine Geschichte erzählt')">Delete</button></div>
+          </div>
+
+          <div class="post-row" data-status="pub">
+            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
+            <div><div class="pr-title">Über die Höflichkeit der Vokale</div><div class="pr-cat">Sprache</div></div>
+            <span><span class="badge pub">Published</span></span>
+            <span class="pr-date">9. Dezember 2025</span>
+            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Über die Höflichkeit der Vokale')">Delete</button></div>
+          </div>
+
+          <div class="posts-empty" id="postsEmpty" hidden>
+            <div class="pe-mark">❑</div>
+            <p>No entries in this view yet.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WRITE / EDITOR VIEW -->
+    <section id="view-write" hidden>
+      <div class="topbar">
+        <h1>Write a <em>new entry</em></h1>
+        <div class="t-actions">
+          <button class="btn btn-ghost" onclick="showView('dash')">Cancel</button>
+          <button class="btn btn-ghost" onclick="openPreview()">Preview</button>
+          <button class="btn btn-primary">Publish <span class="arrow">→</span></button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="editor">
+
+          <!-- main editor -->
+          <div class="ed-main">
+            <input class="ed-title" type="text" placeholder="Titel des Eintrags…" value="Frühling, oder: zu viele neue Wörter">
+            <div class="ed-meta-row">
+              <select class="ed-cat">
+                <option>Leben</option><option>Sprache</option><option>Kultur</option><option>Reisen</option><option>Küche</option>
+              </select>
+              <span class="ed-de-flag">● Geschrieben auf Deutsch</span>
+            </div>
+
+            <p class="ed-label">Excerpt (Auszug)</p>
+            <textarea class="ed-excerpt" rows="2" placeholder="Ein kurzer Satz für die Vorschau…">Der Frühling bringt Sonne — und gefühlt hundert neue Wörter, die ich nicht kannte.</textarea>
+
+            <p class="ed-label">Body (Inhalt)</p>
+            <div class="ed-toolbar">
+              <button title="Bold"><strong>B</strong></button>
+              <button title="Italic"><em>I</em></button>
+              <button title="Heading">H</button>
+              <button title="Quote">„“</button>
+              <button title="List">≣</button>
+              <button title="Link">🔗</button>
+            </div>
+            <textarea class="ed-body" placeholder="Schreibe deinen Eintrag…">Heute war der erste richtig warme Tag des Jahres. Ich saß im Park, hörte den Leuten zu und schrieb mir jedes Wort auf, das ich nicht verstand. Am Ende hatte ich eine ganze Seite voll.
+
+„Knospe“. „Amsel“. „Sonnenstrahl“. Worte, die im Winter geschlafen hatten und jetzt alle gleichzeitig aufwachten.
+
+Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf einer Bank, mit einer Liste voller neuer Wörter und der Sonne im Gesicht.</textarea>
+          </div>
+
+          <!-- right rail -->
+          <aside class="rail">
+            <div class="rail-box">
+              <h3>Publish</h3>
+              <div class="pub-line"><span>Status</span><span class="seg"><button class="on">Draft</button><button>Live</button></span></div>
+              <div class="pub-line"><span>Visibility</span><strong>Public</strong></div>
+              <div class="pub-line"><span>Date</span><strong id="pubDateLabel">Heute</strong></div>
+              <label class="sched-toggle" onclick="toggleSchedule(this)">
+                <span class="switch"></span>
+                Publish later
+              </label>
+              <div class="sched-field" id="schedField" hidden>
+                <input type="datetime-local" id="schedInput" onchange="onScheduleChange()">
+              </div>
+              <div class="pub-actions">
+                <button class="btn btn-ghost">Save draft</button>
+                <button class="btn btn-primary">Publish entry <span class="arrow">→</span></button>
+              </div>
+            </div>
+
+            <div class="rail-box">
+              <h3>Featured image</h3>
+              <div class="dropzone">
+                <image-slot id="editor-featured" shape="rect" placeholder="Drag an image here, or click to browse"></image-slot>
+              </div>
+              <label class="thumb-toggle" onclick="this.querySelector('.switch').classList.toggle('on')">
+                <span class="switch on"></span>
+                Set as post thumbnail
+              </label>
+              <p class="upload-hint">JPG or PNG · used as the cover on the home page, archive cards, and the entry header.</p>
+            </div>
+
+            <div class="rail-box">
+              <h3>Tags</h3>
+              <input class="tag-input" type="text" placeholder="Tag hinzufügen + Enter">
+              <div class="tag-chips"><span>#Frühling</span><span>#Wörter</span><span>#Park</span></div>
+            </div>
+          </aside>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS VIEW -->
+    <section id="view-settings" hidden>
+      <div class="topbar">
+        <h1>Settings</h1>
+        <div class="t-actions">
+          <button class="btn btn-primary">Save changes</button>
+          <div class="user-pill"><span class="av"><image-slot id="author-portrait" shape="rect" placeholder="You"></image-slot></span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="set-grid">
+
+          <div class="set-box">
+            <h3>Blog identity</h3>
+            <p class="h-sub">The name and line that appear across the site.</p>
+            <div class="field"><label>Site title</label><input type="text" value="Deutsch Entries"></div>
+            <div class="field"><label>Tagline</label><input type="text" value="A diary of learning German, one cultural detour at a time."></div>
+            <div class="field"><label>Current level</label>
+              <select><option>A1</option><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option></select>
+            </div>
+          </div>
+
+          <div class="set-box">
+            <h3>Author</h3>
+            <p class="h-sub">Shown on the About page and post bylines.</p>
+            <div class="set-portrait">
+              <div class="sp-img"><image-slot id="set-portrait" shape="rect" placeholder="Portrait"></image-slot></div>
+              <div style="flex:1">
+                <div class="field" style="margin-bottom:12px"><label>Display name</label><input type="text" value="die Autorin"></div>
+              </div>
+            </div>
+            <div class="field" style="margin-top:16px"><label>Short bio</label><textarea rows="3">Eine Lernende, kein Profi. Ich schreibe dieses Tagebuch, um mein Deutsch zu üben — Korrekturen sind herzlich willkommen.</textarea></div>
+          </div>
+
+          <div class="set-box full">
+            <h3>Home hero images</h3>
+            <p class="h-sub">The fixed collage on the home page — set once, used as site dressing (separate from per-post thumbnails).</p>
+            <div class="set-hero">
+              <div><div class="sh-slot"><image-slot id="set-hero-rug" shape="rect" placeholder="Persian rug"></image-slot></div><div class="sh-cap">Rug texture</div></div>
+              <div><div class="sh-slot"><image-slot id="set-hero-arch" shape="rect" placeholder="Cathedral / castle"></image-slot></div><div class="sh-cap">Architecture</div></div>
+              <div><div class="sh-slot"><image-slot id="set-hero-citrus" shape="rect" placeholder="Lemon"></image-slot></div><div class="sh-cap">Citrus accent</div></div>
+            </div>
+          </div>
+
+          <div class="set-box full">
+            <h3>Links</h3>
+            <p class="h-sub">Optional — shown in the footer.</p>
+            <div class="field"><label>Instagram</label><input type="text" placeholder="https://instagram.com/…"></div>
+            <div class="field"><label>Email</label><input type="text" value="hallo@deutschentries.de"></div>
+          </div>
+
+        </div>
+        <div class="set-save">
+          <button class="btn btn-ghost" onclick="showView('dash')">Cancel</button>
+          <button class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div id="previewModal" class="preview-veil" hidden>
+  <div class="preview-card">
+    <div class="preview-bar">
+      <span class="pv-tag">Preview · how readers will see it</span>
+      <button class="pv-close" onclick="closePreview()" aria-label="Close">×</button>
+    </div>
+    <div class="preview-body">
+      <div class="pv-cats"><span id="pvCat">Leben</span><span>Auf Deutsch</span></div>
+      <h1 id="pvTitle">Titel</h1>
+      <div class="pv-date" id="pvDate">Heute · Entwurf</div>
+      <div class="pv-hero"><image-slot id="editor-featured" shape="rect" placeholder="Featured image"></image-slot></div>
+      <div class="pv-text" id="pvText"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div id="delModal" class="modal-veil" hidden>
+  <div class="modal">
+    <h3>Delete this <em>entry</em>?</h3>
+    <p>You're about to delete <strong id="delTitle">this post</strong>. This can't be undone — it will be removed from the blog, the home page, and the archive.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeDelete()">Keep it</button>
+      <button class="btn-danger" onclick="confirmDelete()">Delete entry</button>
+    </div>
+  </div>
+</div>
+
+<script src="image-slot.js"></script>
+<script>
+function showView(v, el){
+  ['dash','write','settings'].forEach(function(name){
+    var sec = document.getElementById('view-' + name);
+    if(sec) sec.hidden = (name !== v);
+  });
+  document.querySelectorAll('.side nav button').forEach(function(b){
+    b.classList.toggle('active', b.dataset.view === v);
+  });
+  window.scrollTo(0,0);
+}
+
+/* ----- filter posts by status ----- */
+function filterPosts(status, el){
+  document.querySelectorAll('.filter-tabs .ftab').forEach(function(t){ t.classList.remove('active'); });
+  if(el) el.classList.add('active');
+  var shown = 0;
+  document.querySelectorAll('.post-row:not(.head)').forEach(function(row){
+    var vis = status === 'all' || row.getAttribute('data-status') === status;
+    row.style.display = vis ? '' : 'none';
+    if(vis) shown++;
+  });
+  document.getElementById('postsEmpty').hidden = shown !== 0;
+}
+
+/* ----- schedule control ----- */
+function toggleSchedule(label){
+  var sw = label.querySelector('.switch');
+  sw.classList.toggle('on');
+  var on = sw.classList.contains('on');
+  document.getElementById('schedField').hidden = !on;
+  if(on){
+    var input = document.getElementById('schedInput');
+    if(!input.value){
+      var d = new Date(Date.now() + 86400000);
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      input.value = d.toISOString().slice(0,16);
+    }
+    onScheduleChange();
+  } else {
+    document.getElementById('pubDateLabel').textContent = 'Heute';
+  }
+}
+function onScheduleChange(){
+  var v = document.getElementById('schedInput').value;
+  if(!v) return;
+  var d = new Date(v);
+  var label = d.toLocaleDateString('de-DE', { day:'numeric', month:'long' }) +
+              ', ' + d.toLocaleTimeString('de-DE', { hour:'2-digit', minute:'2-digit' });
+  document.getElementById('pubDateLabel').textContent = label + ' Uhr';
+}
+
+/* ----- preview ----- */
+function openPreview(){
+  var title = document.querySelector('.ed-title').value || 'Ohne Titel';
+  var cat = document.querySelector('.ed-cat').value;
+  var body = document.querySelector('.ed-body').value || '';
+  var sched = document.getElementById('pubDateLabel').textContent;
+  document.getElementById('pvTitle').textContent = title;
+  document.getElementById('pvCat').textContent = cat;
+  document.getElementById('pvText').textContent = body;
+  document.getElementById('pvDate').textContent = (sched === 'Heute' ? 'Heute' : 'Geplant: ' + sched) + ' · Vorschau';
+  document.getElementById('previewModal').hidden = false;
+}
+function closePreview(){ document.getElementById('previewModal').hidden = true; }
+document.getElementById('previewModal').addEventListener('click', function(e){
+  if(e.target === this) closePreview();
+});
+
+var pendingRow = null;
+function askDelete(btn, title){
+  pendingRow = btn.closest('.post-row');
+  document.getElementById('delTitle').textContent = '“' + title + '”';
+  document.getElementById('delModal').hidden = false;
+}
+function closeDelete(){
+  document.getElementById('delModal').hidden = true;
+  pendingRow = null;
+}
+function confirmDelete(){
+  if(pendingRow){
+    pendingRow.classList.add('removing');
+    var row = pendingRow;
+    setTimeout(function(){ row.remove(); }, 260);
+  }
+  closeDelete();
+}
+document.getElementById('delModal').addEventListener('click', function(e){
+  if(e.target === this) closeDelete();
+});
+</script>
+</body>
+</html>

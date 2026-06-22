@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Der Geschmack von Zitronen im Winter — Deutsch Entries</title>
+<link rel="stylesheet" href="site.css">
+<style>
+/* more breathing room on the sides */
+.wrap{ max-width:1120px; padding-left:clamp(40px,7vw,90px); padding-right:clamp(40px,7vw,90px); }
+.post-top{ padding-top:clamp(36px,5vw,64px); padding-bottom:clamp(20px,3vw,34px); }
+.crumb{ display:flex; gap:8px; align-items:center; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:26px; }
+.crumb a:hover{ color:var(--rug); }
+.post-head{ max-width:760px; }
+.post-head .cats{ display:flex; gap:10px; margin-bottom:20px; }
+.post-head .cats span{ background:var(--cream-deep); color:var(--rug); font-size:11px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; padding:6px 13px; border-radius:999px; }
+.post-head h1{ font-size:clamp(2.6rem,6vw,4.6rem); line-height:1.02; }
+.post-head h1 em{ font-style:italic; color:var(--rug); }
+.post-head .dek{ font-family:var(--serif); font-style:italic; font-size:clamp(1.2rem,2.4vw,1.6rem); color:var(--ink-soft); margin-top:22px; max-width:46ch; line-height:1.4; }
+.byline{ display:flex; align-items:center; gap:14px; margin-top:30px; padding-top:24px; border-top:1px solid var(--line); }
+.byline .av{ width:48px; height:48px; border-radius:50%; overflow:hidden; flex:none; box-shadow:var(--shadow-soft); }
+.byline .who{ font-weight:600; }
+.byline .when{ color:var(--ink-faint); font-size:13.5px; }
+
+.post-hero{ height:clamp(360px,48vw,620px); margin:clamp(26px,4vw,48px) 0 clamp(34px,5vw,60px); box-shadow:var(--shadow); border-radius:14px; overflow:hidden; }
+.post-hero image-slot{ width:100%; height:100%; }
+.hero-cap{ text-align:center; font-size:13px; color:var(--ink-faint); margin-top:-30px; margin-bottom:46px; font-style:italic; }
+
+/* reading column */
+.read-col{ max-width:680px; margin:0 auto; font-size:19px; line-height:1.78; color:#34291f; }
+.read-col p{ margin:0 0 1.4em; }
+.read-col .drop::first-letter{
+  font-family:var(--serif); font-weight:700; float:left; font-size:5.4em; line-height:.74;
+  padding:8px 14px 0 0; color:var(--rug);
+}
+.read-col h2{ font-size:1.9rem; margin:1.8em 0 .6em; }
+.pull{
+  margin:1.8em 0; padding:6px 0 6px 28px; border-left:4px solid var(--rug);
+  font-family:var(--serif); font-style:italic; font-size:1.7rem; line-height:1.34; color:var(--ink);
+}
+.inline-collage{ display:grid; grid-template-columns:1.4fr 1fr; gap:16px; margin:2.4em 0; align-items:center; }
+.inline-collage .ic-a{ height:300px; box-shadow:var(--shadow); }
+.inline-collage .ic-b{ height:230px; box-shadow:var(--shadow-soft); border-radius:8px; overflow:hidden; transform:rotate(3deg); }
+.inline-collage image-slot{ width:100%; height:100%; }
+.figcap{ grid-column:1/-1; font-size:13px; color:var(--ink-faint); font-style:italic; text-align:center; margin-top:6px; }
+.gloss{ background:var(--cream-deep); border-radius:12px; padding:22px 26px; margin:2.2em 0; font-size:16px; }
+.gloss .gt{ font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--rug); font-weight:700; margin-bottom:12px; }
+.gloss dl{ margin:0; display:grid; grid-template-columns:auto 1fr; gap:8px 18px; }
+.gloss dt{ font-family:var(--serif); font-style:italic; color:var(--terracotta); }
+.gloss dd{ margin:0; color:var(--ink-soft); }
+
+.post-foot{ max-width:680px; margin:clamp(40px,5vw,64px) auto 0; }
+.tagrow{ display:flex; gap:10px; flex-wrap:wrap; padding:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.tagrow a{ font-size:13px; color:var(--ink-soft); background:var(--cream-deep); padding:6px 14px; border-radius:999px; }
+.tagrow a:hover{ color:var(--rug); }
+.authorbox{ display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:center; margin:34px 0; }
+.authorbox .ab-img{ width:96px; height:120px; box-shadow:var(--shadow); }
+.authorbox image-slot{ width:100%; height:100%; }
+.authorbox h4{ font-size:1.4rem; }
+.authorbox p{ color:var(--ink-soft); font-size:15px; margin:6px 0 0; }
+
+.prevnext{ display:grid; grid-template-columns:1fr 1fr; gap:18px; max-width:1000px; margin:40px auto 0; }
+.pn{ display:flex; flex-direction:column; gap:6px; padding:22px 26px; border-radius:12px; background:var(--paper); border:1px solid var(--paper-edge); transition:.2s; }
+.pn:hover{ box-shadow:var(--shadow-soft); }
+.pn .dir{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); }
+.pn .t{ font-family:var(--serif); font-size:1.25rem; }
+.pn.next{ text-align:right; }
+.pn:hover .t{ color:var(--rug); }
+
+.mobile-menu{ display:none; }
+.read-progress{ position:fixed; top:0; left:0; height:3px; width:0; background:var(--rug); z-index:200; transition:width .08s linear; }
+@media (max-width:620px){
+  .inline-collage{ grid-template-columns:1fr; }
+  .prevnext{ grid-template-columns:1fr; }
+  .authorbox{ grid-template-columns:1fr; text-align:left; }
+  .mobile-menu.open{ display:flex; position:fixed; inset:0; z-index:100; background:rgba(43,33,26,.96); flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+  .mobile-menu a{ color:var(--cream); font-family:var(--serif); font-size:1.8rem; }
+}
+</style>
+</head>
+<body>
+<div class="read-progress" id="readProgress"></div>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><span class="mark">Deutsch <em>Entries</em></span><span class="dot"></span></a>
+    <nav class="nav-links">
+      <a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="archive.html#search" class="nav-search" aria-label="Search the archive">⌕</a><a href="login.html" class="nav-login">Login</a>
+    </nav>
+    <button class="nav-toggle">Menu</button>
+  </div>
+</header>
+<div class="mobile-menu"><a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a></div>
+
+<article>
+  <div class="wrap post-top">
+    <div class="crumb"><a href="index.html">Home</a><span>›</span><a href="archive.html">Archive</a><span>›</span><span>Küche</span></div>
+    <div class="post-head">
+      <div class="cats"><span>Küche</span><span>Kultur</span></div>
+      <h1>Der Geschmack von <em>Zitronen</em> im Winter</h1>
+      <p class="dek">Wie eine Schale gelber Früchte im Dezember zu einem kleinen Versprechen wird — und mein längster Eintrag bis jetzt.</p>
+      <div class="byline">
+        <div class="av"><image-slot id="author-portrait" shape="rect" placeholder="Author"></image-slot></div>
+        <div>
+          <div class="who">von der Autorin</div>
+          <div class="when">14. Juni 2026 · 9 Minuten Lesezeit · auf Deutsch</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="post-hero">
+      <image-slot id="thumb-zitronen" shape="rect" placeholder="Lemons on a windowsill in winter light"></image-slot>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="read-col">
+      <p class="drop">Im Dezember kaufe ich Zitronen, als wären sie kleine Sonnen für die Wohnung. Der Markt ist grau, die Menschen tragen dicke Mäntel, und zwischen den Ständen liegt ein einziger gelber Haufen, der so leuchtet, als hätte ihn jemand vergessen einzupacken. Ich nehme sechs Stück mit nach Hause, mehr als ich brauche, und stelle sie in eine Schale auf das Fensterbrett.</p>
+
+      <p>Als ich anfing, Deutsch zu lernen, konnte ich noch nicht über solche Dinge schreiben. Ich kannte das Wort „Zitrone“, und ich kannte das Wort „Winter“, aber dazwischen lag eine große Stille. Heute, vierzehn Monate später, merke ich, dass die Stille kleiner geworden ist. Ich habe jetzt Wörter für das Licht, für die Sehnsucht, für die Farbe Gelb an einem Tag ohne Sonne.</p>
+
+      <p class="pull">„Eine Sprache zu lernen heißt, langsam wieder benennen zu dürfen, was man sieht.“</p>
+
+      <p>Die Zitrone ist für mich zu einem Symbol geworden. Sie kommt aus dem Süden, aus der Wärme, und doch steht sie hier, in einer kalten Küche im Norden, und tut so, als gehöre sie hierher. Ein bisschen wie ich. Ich bin auch von weit her gekommen, und an manchen Tagen gehöre ich noch nicht ganz dazu — aber ich leuchte trotzdem, so gut ich kann.</p>
+
+      <div class="inline-collage">
+        <div class="ic-a arch"><image-slot id="post-ic-a" shape="rect" placeholder="Market stall, citrus crates"></image-slot></div>
+        <div class="ic-b"><image-slot id="post-ic-b" shape="rect" placeholder="Sliced lemon, close up"></image-slot></div>
+        <div class="figcap">Der Wintermarkt — die einzige Farbe zwischen all dem Grau.</div>
+      </div>
+
+      <h2>Worte, die nach Süden schmecken</h2>
+      <p>Es gibt im Deutschen ein Wort, das ich besonders liebe: „Fernweh“. Es bedeutet die Sehnsucht nach einem Ort, an dem man noch nie war. Wenn ich eine Zitrone aufschneide, spüre ich genau dieses Gefühl. Der Duft erzählt von Zitronenbäumen, von warmen Mauern, von einem Land voller Licht — und ich stehe in meiner Küche und träume mit einem Messer in der Hand.</p>
+
+      <p>Vielleicht ist das der eigentliche Grund, warum ich diese Sprache lerne. Nicht für die Grammatik, nicht für die Prüfungen, sondern für die Momente, in denen ein einziges Wort eine ganze Landschaft öffnet. „Geborgenheit“. „Feierabend“. „Vorfreude“. Worte wie kleine Räume, in die man eintreten kann.</p>
+
+      <div class="gloss">
+        <div class="gt">Kleines Glossar</div>
+        <dl>
+          <dt>das Fernweh</dt><dd>longing for a place you've never been</dd>
+          <dt>die Vorfreude</dt><dd>the joy of looking forward to something</dd>
+          <dt>die Geborgenheit</dt><dd>a warm sense of safety and belonging</dd>
+        </dl>
+      </div>
+
+      <p>Wenn der Winter vorbei ist, werde ich die Schale wieder wegräumen. Aber bis dahin bleibt sie dort, auf dem Fensterbrett, sechs kleine Sonnen gegen das Grau. Und jedes Mal, wenn ich daran vorbeigehe, übe ich leise einen neuen Satz — auf Deutsch, langsam, mit dem Geschmack von Süden auf der Zunge.</p>
+    </div>
+  </div>
+
+  <div class="wrap post-foot">
+    <div class="tagrow">
+      <a href="archive.html">#Winter</a><a href="archive.html">#Zitronen</a><a href="archive.html">#Sehnsucht</a><a href="archive.html">#Sprache</a><a href="archive.html">#Alltag</a>
+    </div>
+    <div class="authorbox">
+      <div class="ab-img frame tilt-l" style="padding:6px"><image-slot id="author-portrait" shape="rect" placeholder="Author"></image-slot></div>
+      <div>
+        <span class="label">Über die Autorin</span>
+        <h4 style="margin-top:6px">Eine Lernende, kein Profi</h4>
+        <p>Ich schreibe dieses Tagebuch, um mein Deutsch zu üben und um nicht zu vergessen, wie es sich anfühlt, eine Sprache zu lieben, bevor man sie ganz beherrscht. Korrekturen sind herzlich willkommen.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="prevnext">
+      <a href="post.html" class="pn prev"><span class="dir">← Vorheriger Eintrag</span><span class="t">Wie ein Teppich eine Geschichte erzählt</span></a>
+      <a href="post.html" class="pn next"><span class="dir">Nächster Eintrag →</span><span class="t">Kathedralen und das Schweigen aus Stein</span></a>
+    </div>
+  </div>
+</article>
+
+<footer class="footer" style="margin-top:80px">
+  <div class="footer-inner">
+    <div><h4>Deutsch <em>Entries</em></h4><p>A personal diary of learning German, one cultural detour at a time. Written in German, kept in English, dusted with lemon.</p></div>
+    <div><div class="col-title">Pages</div><div class="footer-links"><a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a></div></div>
+    <div><div class="col-title">Themen</div><div class="footer-links"><a href="archive.html">Sprache</a><a href="archive.html">Kultur</a><a href="archive.html">Reisen</a><a href="archive.html">Leben</a></div></div>
+  </div>
+  <div class="footer-base"><span>© 2026 Deutsch Entries — geschrieben mit Geduld.</span><span>Made with cream, carpets &amp; citrus.</span></div>
+</footer>
+
+<script src="image-slot.js"></script>
+<script src="site.js"></script>
+<script>
+(function(){
+  var bar = document.getElementById('readProgress');
+  var article = document.querySelector('article');
+  function update(){
+    var rect = article.getBoundingClientRect();
+    var total = article.offsetHeight - window.innerHeight;
+    var passed = Math.min(Math.max(-rect.top, 0), total);
+    var pct = total > 0 ? (passed / total) * 100 : 0;
+    bar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', update, { passive:true });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
+</body>
+</html>
