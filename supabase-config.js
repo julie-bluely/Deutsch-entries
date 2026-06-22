@@ -1,23 +1,45 @@
 // ============================================================
 //  Supabase connection — Deutsch Entries
-//  Fill in the two values below, then save.
-//  These are SAFE to keep in front-end code (the anon key is
-//  designed to be public; your data is protected by login +
-//  Row Level Security, not by hiding this key).
+//  Paste your two values below, save, upload to GitHub. Done.
+//  The anon key is SAFE in front-end code: your data is guarded
+//  by login + Row Level Security, not by hiding this key.
 // ============================================================
 
-// 1) Paste your Project URL here (the "API URL", ends in .supabase.co)
-const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
+// 1) Project URL  (the "API URL", ends in .supabase.co)
+const SUPABASE_URL = "https://wbodebovbehggpibpckk.supabase.co";
 
-// 2) Paste your anon / public key here (the long string, starts with eyJ...)
-const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_PUBLIC_KEY_HERE";
+// 2) anon / public key  (the long string, usually starts with eyJ...)
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indib2RlYm92YmVoZ2dwaWJwY2trIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMDE3OTgsImV4cCI6MjA5NzY3Nzc5OH0.Q7Wy5qyUFhAz-dlcRH54rG0js8eKEHEj4_smX9LG-Qo";
 
 // ------------------------------------------------------------
-//  Below this line you normally don't need to touch anything.
-//  Requires the Supabase JS SDK to be loaded first, e.g.:
-//  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+//  You normally don't need to touch anything below.
 // ------------------------------------------------------------
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+(function () {
+  var looksFilled =
+    SUPABASE_URL &&
+    SUPABASE_ANON_KEY &&
+    SUPABASE_URL.indexOf("PASTE_") === -1 &&
+    SUPABASE_ANON_KEY.indexOf("PASTE_") === -1 &&
+    /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL);
 
-// Make it available to the other scripts (auth.js, admin.js, public.js)
-window.db = supabaseClient;
+  // Is the Supabase SDK present on the page?
+  var sdkReady = !!(window.supabase && window.supabase.createClient);
+
+  window.SUPABASE_CONFIGURED = !!(looksFilled && sdkReady);
+
+  if (window.SUPABASE_CONFIGURED) {
+    window.db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else {
+    window.db = null;
+    if (!looksFilled) {
+      console.info(
+        "[Deutsch Entries] Supabase keys not set yet — the site is showing its built-in sample content. " +
+          "Paste your Project URL + anon key into supabase-config.js to go live."
+      );
+    } else if (!sdkReady) {
+      console.warn(
+        "[Deutsch Entries] Supabase SDK not loaded. Make sure the @supabase/supabase-js script tag is above supabase-config.js."
+      );
+    }
+  }
+})();

@@ -77,14 +77,14 @@ body{ min-height:100vh; }
       <h1>Sign <em>in</em></h1>
       <p class="sub">This diary has a single author. Sign in to write, edit, and publish new entries.</p>
 
-      <form onsubmit="window.location.href='admin.html';return false;">
+      <form>
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" type="email" placeholder="autorin@deutschentries.de" value="autorin@deutschentries.de">
+          <input id="email" type="email" placeholder="autorin@deutschentries.de">
         </div>
         <div class="field">
           <label for="pw">Password</label>
-          <input id="pw" type="password" placeholder="••••••••••" value="passwort">
+          <input id="pw" type="password" placeholder="••••••••••">
         </div>
         <div class="row-between">
           <label class="remember"><input type="checkbox" checked> Keep me signed in</label>
@@ -93,11 +93,15 @@ body{ min-height:100vh; }
         <button type="submit" class="btn btn-primary btn-full">Enter the studio <span class="arrow">→</span></button>
       </form>
 
-      <p class="login-note">Single-author blog · no public registration. <br>Demo only — any details will take you in.</p>
+      <p class="login-note">Single-author blog · no public registration. <br>Sign in with the admin account you created in Supabase.</p>
     </div>
   </div>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="js/shared.js"></script>
 <script src="image-slot.js"></script>
+<script src="js/auth.js"></script>
 </body>
 </html>

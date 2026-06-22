@@ -17,7 +17,9 @@
           {
             "group": [
               "image-slot.js",
-              "site.js"
+              "js/**",
+              "site.js",
+              "supabase-config.js"
             ],
             "message": "Import design-system components from 'index.js', not component internals."
           }

@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","site.js":"4c44c1f46d4b"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"aec4eec8a80d","js/auth.js":"6efed58365ea","js/public.js":"bf9f6e8385fa","js/shared.js":"6ca23587155a","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -653,6 +653,644 @@ try { (() => {
 })();
 })(); } catch (e) { __ds_ns.__errors.push({ path: "image-slot.js", error: String((e && e.message) || e) }); }
 
+// js/admin.js
+try { (() => {
+// ============================================================
+//  Admin — Deutsch Entries
+//  Loads real posts, wires create / edit / delete / publish /
+//  schedule / image upload. Falls back to the built-in sample
+//  rows when Supabase keys aren't set yet (design preview).
+// ============================================================
+(function () {
+  if (!document.querySelector(".admin")) return; // not the admin page
+  if (!window.SUPABASE_CONFIGURED || !window.db) return; // keep sample UI as-is
+  var db = window.db;
+  var H = window.DE;
+  var editingId = null; // null = writing a new post
+  var pendingImageFile = null; // a freshly picked image not yet uploaded
+  var pendingImageExistingUrl = null; // thumb already on the post being edited
+
+  // run once the session guard confirms we're logged in
+  if (window.__ADMIN_SESSION) start();else document.addEventListener("admin-authed", start);
+  function start() {
+    overlayUploader();
+    wireEditorButtons();
+    wireNewEntryButtons();
+    wireDeleteModal();
+    wireStatusSegment();
+    loadPosts();
+  }
+
+  // ---------- LOAD + RENDER THE DASHBOARD LIST ----------
+  function loadPosts() {
+    db.from("posts").select("*").order("publish_at", {
+      ascending: false
+    }).then(function (res) {
+      if (res.error) {
+        console.error(res.error);
+        return;
+      }
+      renderRows(res.data || []);
+    });
+  }
+  function renderRows(posts) {
+    var container = document.querySelector(".posts");
+    if (!container) return;
+    var head = container.querySelector(".post-row.head");
+    var empty = document.getElementById("postsEmpty");
+
+    // remove existing data rows (keep header + empty state)
+    container.querySelectorAll(".post-row:not(.head)").forEach(function (r) {
+      r.remove();
+    });
+    var placeholderSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + '<rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>';
+    posts.forEach(function (p) {
+      var isPub = p.status === "published";
+      var row = document.createElement("div");
+      row.className = "post-row";
+      row.setAttribute("data-status", isPub ? "pub" : "draft");
+      row.dataset.id = p.id;
+      var thumb = p.thumb_url ? '<img src="' + H.esc(p.thumb_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : placeholderSvg;
+      var badge = isPub ? '<span class="badge pub">Published</span>' : '<span class="badge draft">Draft</span>';
+      var dateTxt = isPub ? H.formatDateDE(p.publish_at) : "—";
+      row.innerHTML = '<div class="pr-thumb">' + thumb + "</div>" + '<div><div class="pr-title">' + H.esc(p.title) + "</div>" + '<div class="pr-cat">' + H.esc(p.category || "") + "</div></div>" + "<span>" + badge + "</span>" + '<span class="pr-date">' + dateTxt + "</span>" + '<div class="pr-actions">' + '<button class="pr-edit">Edit</button>' + '<button class="pr-del">Delete</button></div>';
+      row.querySelector(".pr-edit").addEventListener("click", function () {
+        editPost(p);
+      });
+      row.querySelector(".pr-del").addEventListener("click", function () {
+        askDelete(p);
+      });
+      if (empty) container.insertBefore(row, empty);else container.appendChild(row);
+    });
+    updateStats(posts);
+
+    // reset the All/Published/Drafts filter to "All"
+    if (typeof window.filterPosts === "function") {
+      var allTab = document.querySelector('.filter-tabs .ftab[data-status="all"]');
+      window.filterPosts("all", allTab);
+    }
+  }
+  function updateStats(posts) {
+    var pub = posts.filter(function (p) {
+      return p.status === "published";
+    }).length;
+    var draft = posts.length - pub;
+    var cards = document.querySelectorAll(".stats .stat-card .n");
+    if (cards[0]) cards[0].textContent = pub;
+    if (cards[1]) cards[1].textContent = draft;
+  }
+
+  // ---------- DELETE (reuses the existing #delModal) ----------
+  var deleteTargetId = null;
+  function askDelete(p) {
+    deleteTargetId = p.id;
+    var t = document.getElementById("delTitle");
+    if (t) t.textContent = "“" + p.title + "”";
+    var modal = document.getElementById("delModal");
+    if (modal) modal.hidden = false;
+  }
+  function wireDeleteModal() {
+    var modal = document.getElementById("delModal");
+    if (!modal) return;
+    var confirmBtn = modal.querySelector(".btn-danger");
+    if (confirmBtn) {
+      confirmBtn.onclick = function () {
+        if (!deleteTargetId) {
+          modal.hidden = true;
+          return;
+        }
+        db.from("posts").delete().eq("id", deleteTargetId).then(function (res) {
+          if (res.error) {
+            alert("Could not delete: " + res.error.message);
+          }
+          deleteTargetId = null;
+          modal.hidden = true;
+          loadPosts();
+        });
+      };
+    }
+  }
+
+  // ---------- NEW ENTRY ----------
+  function wireNewEntryButtons() {
+    // sidebar "New entry" + topbar "+ New entry"
+    document.querySelectorAll('[data-view="write"]').forEach(function (b) {
+      b.addEventListener("click", resetEditor);
+    });
+    document.querySelectorAll(".topbar .btn-primary").forEach(function (b) {
+      if ((b.textContent || "").indexOf("New entry") !== -1) {
+        b.addEventListener("click", resetEditor);
+      }
+    });
+  }
+  function resetEditor() {
+    editingId = null;
+    pendingImageFile = null;
+    pendingImageExistingUrl = null;
+    setVal(".ed-title", "");
+    setVal(".ed-excerpt", "");
+    setVal(".ed-body", "");
+    var cat = document.querySelector(".ed-cat");
+    if (cat) cat.selectedIndex = 0;
+    var slot = document.getElementById("editor-featured");
+    if (slot) slot.removeAttribute("src");
+    var titleEl = document.querySelector("#view-write .topbar h1");
+    if (titleEl) titleEl.innerHTML = "Write a <em>new entry</em>";
+  }
+
+  // ---------- EDIT ----------
+  function editPost(p) {
+    editingId = p.id;
+    pendingImageFile = null;
+    pendingImageExistingUrl = p.thumb_url || null;
+    setVal(".ed-title", p.title || "");
+    setVal(".ed-excerpt", p.excerpt || "");
+    setVal(".ed-body", p.body || "");
+    var cat = document.querySelector(".ed-cat");
+    if (cat) {
+      Array.prototype.forEach.call(cat.options, function (o, i) {
+        if (o.value === p.category || o.textContent === p.category) cat.selectedIndex = i;
+      });
+    }
+    var slot = document.getElementById("editor-featured");
+    if (slot) {
+      if (p.thumb_url) slot.setAttribute("src", p.thumb_url);else slot.removeAttribute("src");
+    }
+    var titleEl = document.querySelector("#view-write .topbar h1");
+    if (titleEl) titleEl.innerHTML = "Edit <em>entry</em>";
+    if (typeof window.showView === "function") window.showView("write");
+  }
+
+  // ---------- IMAGE UPLOAD OVERLAY ----------
+  // <image-slot> is read-only outside the design tool, so we lay a real
+  // file input over the dropzone and preview via the slot's src attribute.
+  function overlayUploader() {
+    var zone = document.querySelector(".dropzone");
+    if (!zone) return;
+    zone.style.position = "relative";
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/png,image/jpeg,image/webp";
+    input.style.cssText = "position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5;";
+    zone.appendChild(input);
+    input.addEventListener("change", function () {
+      var f = input.files && input.files[0];
+      if (!f) return;
+      pendingImageFile = f;
+      var url = URL.createObjectURL(f);
+      var slot = document.getElementById("editor-featured");
+      if (slot) slot.setAttribute("src", url);
+    });
+  }
+  function thumbnailToggleOn() {
+    var sw = document.querySelector(".thumb-toggle .switch");
+    return sw ? sw.classList.contains("on") : true;
+  }
+
+  // ---------- STATUS SEGMENT (Draft / Live) ----------
+  function wireStatusSegment() {
+    var seg = document.querySelector(".rail-box .seg");
+    if (!seg) return;
+    seg.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        seg.querySelectorAll("button").forEach(function (x) {
+          x.classList.remove("on");
+        });
+        b.classList.add("on");
+      });
+    });
+  }
+
+  // ---------- PUBLISH / SAVE DRAFT ----------
+  function wireEditorButtons() {
+    var write = document.getElementById("view-write");
+    if (!write) return;
+    write.querySelectorAll("button").forEach(function (b) {
+      var txt = (b.textContent || "").trim().toLowerCase();
+      if (txt.indexOf("save draft") !== -1) {
+        b.addEventListener("click", function (e) {
+          e.preventDefault();
+          savePost("draft", b);
+        });
+      } else if (txt.indexOf("publish") !== -1) {
+        b.addEventListener("click", function (e) {
+          e.preventDefault();
+          savePost("published", b);
+        });
+      }
+    });
+  }
+  function getVal(sel) {
+    var el = document.querySelector(sel);
+    return el ? (el.value || "").trim() : "";
+  }
+  function setVal(sel, v) {
+    var el = document.querySelector(sel);
+    if (el) el.value = v;
+  }
+  function chosenPublishAt() {
+    var schedSwitch = document.querySelector(".sched-toggle .switch");
+    var on = schedSwitch && schedSwitch.classList.contains("on");
+    var input = document.getElementById("schedInput");
+    if (on && input && input.value) return new Date(input.value).toISOString();
+    return new Date().toISOString();
+  }
+  function savePost(status, btn) {
+    var title = getVal(".ed-title");
+    if (!title) {
+      alert("Please give your entry a title first.");
+      return;
+    }
+    var body = getVal(".ed-body");
+    var category = getVal(".ed-cat") || "Leben";
+    var excerpt = getVal(".ed-excerpt") || H.autoExcerpt(body);
+    var label = btn ? btn.innerHTML : "";
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = "Saving…";
+    }
+    function restore() {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = label;
+      }
+    }
+    maybeUploadImage().then(function (thumbUrl) {
+      var record = {
+        title: title,
+        slug: H.slugify(title) + "-" + Date.now().toString(36),
+        category: category,
+        body: body,
+        excerpt: excerpt,
+        read_min: H.readMinutes(body),
+        status: status,
+        publish_at: chosenPublishAt()
+      };
+      if (thumbUrl) record.thumb_url = thumbUrl;
+      var op;
+      if (editingId) {
+        // don't regenerate slug on edit; keep image if none re-picked
+        delete record.slug;
+        if (!thumbUrl && pendingImageExistingUrl) record.thumb_url = pendingImageExistingUrl;
+        op = db.from("posts").update(record).eq("id", editingId);
+      } else {
+        op = db.from("posts").insert(record);
+      }
+      op.then(function (res) {
+        restore();
+        if (res.error) {
+          alert("Could not save: " + res.error.message);
+          return;
+        }
+        resetEditor();
+        if (typeof window.showView === "function") window.showView("dash");
+        loadPosts();
+      });
+    }).catch(function (err) {
+      restore();
+      alert("Image upload failed: " + (err && err.message ? err.message : err));
+    });
+  }
+
+  // returns a Promise<string|null> with the public thumb URL
+  function maybeUploadImage() {
+    if (!pendingImageFile || !thumbnailToggleOn()) return Promise.resolve(null);
+    var f = pendingImageFile;
+    var ext = (f.name.split(".").pop() || "jpg").toLowerCase();
+    var path = "posts/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
+    return db.storage.from("post-images").upload(path, f, {
+      upsert: false
+    }).then(function (res) {
+      if (res.error) throw res.error;
+      var pub = db.storage.from("post-images").getPublicUrl(path);
+      return pub.data.publicUrl;
+    });
+  }
+})();
+})(); } catch (e) { __ds_ns.__errors.push({ path: "js/admin.js", error: String((e && e.message) || e) }); }
+
+// js/auth.js
+try { (() => {
+// ============================================================
+//  Auth — Deutsch Entries
+//  Handles: login form, admin session guard, sign-out.
+//  Safe before keys are set: login shows a friendly message,
+//  and the admin page stays viewable as a static preview.
+// ============================================================
+(function () {
+  var configured = !!window.SUPABASE_CONFIGURED;
+  var db = window.db;
+
+  // ---- which page are we on? ----
+  var loginForm = document.querySelector(".login-form form");
+  var isAdmin = !!document.querySelector(".admin");
+
+  // ---------- LOGIN PAGE ----------
+  if (loginForm) {
+    // make room for an inline message under the button (reuses page styles)
+    var msg = document.createElement("p");
+    msg.className = "login-note";
+    msg.style.color = "var(--rug)";
+    msg.style.display = "none";
+    msg.style.marginTop = "16px";
+    loginForm.appendChild(msg);
+    function showMsg(text) {
+      msg.textContent = text;
+      msg.style.display = "block";
+    }
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var email = (document.getElementById("email") || {}).value || "";
+      var pw = (document.getElementById("pw") || {}).value || "";
+      if (!configured) {
+        showMsg("The backend isn’t connected yet. Add your Supabase keys to go live — then this form signs you in for real.");
+        return;
+      }
+      if (!email || !pw) {
+        showMsg("Please enter your email and password.");
+        return;
+      }
+      var btn = loginForm.querySelector("button[type=submit]");
+      var label = btn ? btn.innerHTML : "";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "Signing in…";
+      }
+      db.auth.signInWithPassword({
+        email: email,
+        password: pw
+      }).then(function (res) {
+        if (res.error) {
+          showMsg("That didn’t work: " + res.error.message);
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = label;
+          }
+          return;
+        }
+        window.location.href = "admin.html";
+      }).catch(function (err) {
+        showMsg("Connection problem: " + (err && err.message ? err.message : err));
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = label;
+        }
+      });
+    });
+  }
+
+  // ---------- ADMIN PAGE: session guard + sign-out ----------
+  if (isAdmin) {
+    // Wire every "Sign out" link.
+    document.querySelectorAll('a[href="login.html"]').forEach(function (a) {
+      if ((a.textContent || "").toLowerCase().indexOf("sign out") !== -1) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (configured && db) {
+            db.auth.signOut().then(function () {
+              window.location.href = "login.html";
+            });
+          } else {
+            window.location.href = "login.html";
+          }
+        });
+      }
+    });
+
+    // Guard: if keys are set but nobody is logged in, bounce to login.
+    // (Before keys are set we leave the admin viewable as a design preview.)
+    if (configured && db) {
+      db.auth.getSession().then(function (res) {
+        var session = res && res.data ? res.data.session : null;
+        if (!session) {
+          window.location.replace("login.html");
+        } else {
+          window.__ADMIN_SESSION = session;
+          document.dispatchEvent(new CustomEvent("admin-authed"));
+        }
+      });
+    }
+  }
+})();
+})(); } catch (e) { __ds_ns.__errors.push({ path: "js/auth.js", error: String((e && e.message) || e) }); }
+
+// js/public.js
+try { (() => {
+// ============================================================
+//  Public pages — Deutsch Entries
+//  Renders home, archive, and single-post from Supabase.
+//  When keys aren't set (or on any error) it leaves the
+//  hand-designed sample content in place so the site never
+//  looks broken.
+// ============================================================
+(function () {
+  if (!window.SUPABASE_CONFIGURED || !window.db) return; // keep sample content
+  var db = window.db;
+  var H = window.DE;
+  var isPost = !!document.querySelector("article .read-col");
+  var isArchive = !!document.querySelector(".masonry");
+  var isHome = !!document.querySelector(".featured") && !isPost;
+  if (isPost) renderPost();else if (isArchive) renderArchive();else if (isHome) renderHome();
+
+  // ---- live published posts, newest first ----
+  function fetchPublished(limit) {
+    var q = db.from("posts").select("*").eq("status", "published").lte("publish_at", new Date().toISOString()).order("publish_at", {
+      ascending: false
+    });
+    if (limit) q = q.limit(limit);
+    return q;
+  }
+  function readLabel(min) {
+    return (min || 1) + " Min.";
+  }
+
+  // ---------------- HOME ----------------
+  function renderHome() {
+    fetchPublished(7).then(function (res) {
+      if (res.error || !res.data || !res.data.length) return; // keep samples
+      var posts = res.data;
+      var featured = posts[0];
+      var rest = posts.slice(1, 7);
+
+      // ----- featured block -----
+      var f = document.querySelector(".featured");
+      if (f && featured) {
+        var link = "post.html?slug=" + encodeURIComponent(featured.slug);
+        var imgA = f.querySelector(".f-img");
+        if (imgA) {
+          imgA.setAttribute("href", link);
+          setSlot(imgA.querySelector("image-slot"), featured.thumb_url);
+        }
+        setText(f, ".f-tag", "Featured · " + (featured.category || ""));
+        setHTML(f, "h2", H.esc(featured.title));
+        var fde = f.querySelector(".f-de");
+        if (fde) fde.textContent = featured.excerpt || "";
+        var fbody = f.querySelector(".f-body");
+        if (fbody) fbody.textContent = featured.excerpt || H.autoExcerpt(featured.body);
+        var readBtn = f.querySelector(".btn");
+        if (readBtn) readBtn.setAttribute("href", link);
+      }
+
+      // ----- recent grid -----
+      var grid = document.querySelector(".grid-3");
+      if (grid) {
+        grid.innerHTML = rest.map(cardHTML).join("");
+        hydrateSlots(grid, rest);
+      }
+    });
+  }
+
+  // ---------------- ARCHIVE ----------------
+  function renderArchive() {
+    fetchPublished(null).then(function (res) {
+      if (res.error || !res.data || !res.data.length) return; // keep samples
+      var posts = res.data;
+      var heights = ["h-tall", "h-mid", "h-short"];
+      var masonry = document.querySelector(".masonry");
+      if (!masonry) return;
+      masonry.innerHTML = posts.map(function (p, i) {
+        return cardHTML(p, heights[i % heights.length]);
+      }).join("");
+      hydrateSlots(masonry, posts);
+
+      // update the count in the eyebrow
+      var eyebrow = document.querySelector(".arch-head .eyebrow");
+      if (eyebrow) eyebrow.textContent = "Das Archiv · " + posts.length + " Einträge";
+
+      // re-init the existing chip/search filter over the new cards
+      if (typeof window.initArchiveFilter === "function") window.initArchiveFilter();
+    });
+  }
+
+  // a single archive/home card (matches the existing markup)
+  function cardHTML(p, heightClass) {
+    var link = "post.html?slug=" + encodeURIComponent(p.slug);
+    var cls = "card" + (heightClass ? " " + heightClass : "");
+    return '<a href="' + link + '" class="' + cls + '" data-cat="' + H.esc(H.catKey(p.category)) + '">' + '<div class="thumb"><span class="cat">' + H.esc(p.category || "") + "</span>" + '<image-slot shape="rect" data-thumb="' + H.esc(p.thumb_url || "") + '"></image-slot></div>' + '<div class="meta"><span>' + H.formatDateDE(p.publish_at) + "</span>·" + '<span class="de">' + readLabel(p.read_min) + "</span></div>" + "<h3>" + H.esc(p.title) + "</h3>" + '<p class="excerpt">' + H.esc(p.excerpt || H.autoExcerpt(p.body)) + "</p>" + '<span class="read">Weiterlesen →</span></a>';
+  }
+
+  // set image-slot src for cards that carry a data-thumb
+  function hydrateSlots(scope, posts) {
+    scope.querySelectorAll("image-slot[data-thumb]").forEach(function (slot) {
+      var u = slot.getAttribute("data-thumb");
+      if (u) slot.setAttribute("src", u);
+    });
+  }
+  function setSlot(slot, url) {
+    if (slot && url) slot.setAttribute("src", url);
+  }
+
+  // ---------------- SINGLE POST ----------------
+  function renderPost() {
+    var slug = new URLSearchParams(location.search).get("slug");
+    if (!slug) return; // no slug → keep the sample post showing
+
+    db.from("posts").select("*").eq("slug", slug).eq("status", "published").limit(1).then(function (res) {
+      if (res.error) return;
+      var p = res.data && res.data[0];
+      if (!p) {
+        window.location.replace("404.html");
+        return;
+      }
+      document.title = p.title + " — Deutsch Entries";
+      setHTML(document, ".post-head h1", H.esc(p.title));
+      var dek = document.querySelector(".post-head .dek");
+      if (dek) dek.textContent = p.excerpt || "";
+
+      // categories row → one real category + the Auf Deutsch flag
+      var cats = document.querySelector(".post-head .cats");
+      if (cats) cats.innerHTML = "<span>" + H.esc(p.category || "") + "</span>";
+      var crumbCat = document.querySelector(".crumb span:last-child");
+      if (crumbCat) crumbCat.textContent = p.category || "";
+      var when = document.querySelector(".byline .when");
+      if (when) when.textContent = H.formatDateDE(p.publish_at) + " · " + readLabel(p.read_min) + " Lesezeit · auf Deutsch";
+
+      // hero image
+      var hero = document.querySelector(".post-hero image-slot");
+      if (hero) {
+        if (p.thumb_url) hero.setAttribute("src", p.thumb_url);else hero.removeAttribute("src");
+      }
+
+      // body → paragraphs, drop-cap on the first
+      var col = document.querySelector(".read-col");
+      if (col) {
+        var paras = (p.body || "").split(/\n\s*\n/).map(function (t) {
+          return t.trim();
+        }).filter(Boolean);
+        col.innerHTML = paras.map(function (t, i) {
+          return '<p' + (i === 0 ? ' class="drop"' : "") + ">" + H.esc(t) + "</p>";
+        }).join("");
+      }
+    });
+  }
+
+  // ---------- tiny DOM helpers ----------
+  function setText(scope, sel, txt) {
+    var e = scope.querySelector(sel);
+    if (e) e.textContent = txt;
+  }
+  function setHTML(scope, sel, html) {
+    var e = scope.querySelector(sel);
+    if (e) e.innerHTML = html;
+  }
+})();
+})(); } catch (e) { __ds_ns.__errors.push({ path: "js/public.js", error: String((e && e.message) || e) }); }
+
+// js/shared.js
+try { (() => {
+// ============================================================
+//  Shared helpers — Deutsch Entries
+//  Small utilities used by admin.js and public.js.
+// ============================================================
+(function () {
+  var MONTHS_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+  // "14. Juni 2026"
+  function formatDateDE(value) {
+    if (!value) return "—";
+    var d = new Date(value);
+    if (isNaN(d)) return "—";
+    return d.getDate() + ". " + MONTHS_DE[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  // umlaut-safe URL slug: "Über die Höflichkeit" -> "ueber-die-hoeflichkeit"
+  function slugify(title) {
+    return (title || "").toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "eintrag";
+  }
+
+  // rough reading time in minutes (German ~200 wpm)
+  function readMinutes(body) {
+    var words = (body || "").trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.round(words / 200));
+  }
+
+  // first ~160 chars as a fallback excerpt
+  function autoExcerpt(body) {
+    var t = (body || "").replace(/\s+/g, " ").trim();
+    if (t.length <= 160) return t;
+    return t.slice(0, 160).replace(/\s+\S*$/, "") + "…";
+  }
+
+  // escape text before inserting into HTML
+  function esc(s) {
+    return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+
+  // category label -> data-cat key used by the archive filter
+  function catKey(cat) {
+    return (cat || "").toLowerCase().trim();
+  }
+  window.DE = {
+    formatDateDE: formatDateDE,
+    slugify: slugify,
+    readMinutes: readMinutes,
+    autoExcerpt: autoExcerpt,
+    esc: esc,
+    catKey: catKey
+  };
+})();
+})(); } catch (e) { __ds_ns.__errors.push({ path: "js/shared.js", error: String((e && e.message) || e) }); }
+
 // site.js
 try { (() => {
 // shared: mobile nav toggle
@@ -667,5 +1305,42 @@ document.addEventListener('click', function (e) {
   }
 });
 })(); } catch (e) { __ds_ns.__errors.push({ path: "site.js", error: String((e && e.message) || e) }); }
+
+// supabase-config.js
+try { (() => {
+// ============================================================
+//  Supabase connection — Deutsch Entries
+//  Paste your two values below, save, upload to GitHub. Done.
+//  The anon key is SAFE in front-end code: your data is guarded
+//  by login + Row Level Security, not by hiding this key.
+// ============================================================
+
+// 1) Project URL  (the "API URL", ends in .supabase.co)
+const SUPABASE_URL = "https://wbodebovbehggpibpckk.supabase.co";
+
+// 2) anon / public key  (the long string, usually starts with eyJ...)
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indib2RlYm92YmVoZ2dwaWJwY2trIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxMDE3OTgsImV4cCI6MjA5NzY3Nzc5OH0.Q7Wy5qyUFhAz-dlcRH54rG0js8eKEHEj4_smX9LG-Qo";
+
+// ------------------------------------------------------------
+//  You normally don't need to touch anything below.
+// ------------------------------------------------------------
+(function () {
+  var looksFilled = SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL.indexOf("PASTE_") === -1 && SUPABASE_ANON_KEY.indexOf("PASTE_") === -1 && /^https:\/\/.+\.supabase\.co/.test(SUPABASE_URL);
+
+  // Is the Supabase SDK present on the page?
+  var sdkReady = !!(window.supabase && window.supabase.createClient);
+  window.SUPABASE_CONFIGURED = !!(looksFilled && sdkReady);
+  if (window.SUPABASE_CONFIGURED) {
+    window.db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else {
+    window.db = null;
+    if (!looksFilled) {
+      console.info("[Deutsch Entries] Supabase keys not set yet — the site is showing its built-in sample content. " + "Paste your Project URL + anon key into supabase-config.js to go live.");
+    } else if (!sdkReady) {
+      console.warn("[Deutsch Entries] Supabase SDK not loaded. Make sure the @supabase/supabase-js script tag is above supabase-config.js.");
+    }
+  }
+})();
+})(); } catch (e) { __ds_ns.__errors.push({ path: "supabase-config.js", error: String((e && e.message) || e) }); }
 
 })();
