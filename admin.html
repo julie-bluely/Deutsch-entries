@@ -244,46 +244,6 @@ body{ background:var(--cream-deep); }
             <span></span><span>Title</span><span class="pr-cat-col">Status</span><span class="pr-date">Date</span><span></span>
           </div>
 
-          <div class="post-row" data-status="pub">
-            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
-            <div><div class="pr-title">Der Geschmack von Zitronen im Winter</div><div class="pr-cat">Küche · Kultur</div></div>
-            <span><span class="badge pub">Published</span></span>
-            <span class="pr-date">14. Juni 2026</span>
-            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Der Geschmack von Zitronen im Winter')">Delete</button></div>
-          </div>
-
-          <div class="post-row" data-status="pub">
-            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
-            <div><div class="pr-title">Kathedralen und das Schweigen aus Stein</div><div class="pr-cat">Reisen</div></div>
-            <span><span class="badge pub">Published</span></span>
-            <span class="pr-date">2. Mai 2026</span>
-            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Kathedralen und das Schweigen aus Stein')">Delete</button></div>
-          </div>
-
-          <div class="post-row" data-status="draft">
-            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
-            <div><div class="pr-title">Frühling, oder: zu viele neue Wörter</div><div class="pr-cat">Leben</div></div>
-            <span><span class="badge draft">Draft</span></span>
-            <span class="pr-date">—</span>
-            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Frühling, oder: zu viele neue Wörter')">Delete</button></div>
-          </div>
-
-          <div class="post-row" data-status="pub">
-            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
-            <div><div class="pr-title">Wie ein Teppich eine Geschichte erzählt</div><div class="pr-cat">Kultur</div></div>
-            <span><span class="badge pub">Published</span></span>
-            <span class="pr-date">18. März 2026</span>
-            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Wie ein Teppich eine Geschichte erzählt')">Delete</button></div>
-          </div>
-
-          <div class="post-row" data-status="pub">
-            <div class="pr-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg></div>
-            <div><div class="pr-title">Über die Höflichkeit der Vokale</div><div class="pr-cat">Sprache</div></div>
-            <span><span class="badge pub">Published</span></span>
-            <span class="pr-date">9. Dezember 2025</span>
-            <div class="pr-actions"><button class="pr-edit" onclick="showView('write')">Edit</button><button class="pr-del" onclick="askDelete(this,'Über die Höflichkeit der Vokale')">Delete</button></div>
-          </div>
-
           <div class="posts-empty" id="postsEmpty" hidden>
             <div class="pe-mark">❑</div>
             <p>No entries in this view yet.</p>
@@ -308,18 +268,18 @@ body{ background:var(--cream-deep); }
 
           <!-- main editor -->
           <div class="ed-main">
-            <input class="ed-title" type="text" placeholder="Titel des Eintrags…" value="Frühling, oder: zu viele neue Wörter">
+            <input class="ed-title" type="text" placeholder="Entry title…" value="">
             <div class="ed-meta-row">
               <select class="ed-cat">
                 <option>Life</option><option>Language</option><option>Culture</option><option>Travel</option><option>Food</option>
               </select>
-              <span class="ed-de-flag">● Geschrieben auf Deutsch</span>
+              <span class="ed-de-flag">● Written in German</span>
             </div>
 
-            <p class="ed-label">Excerpt (Auszug)</p>
-            <textarea class="ed-excerpt" rows="2" placeholder="Ein kurzer Satz für die Vorschau…">Der Frühling bringt Sonne — und gefühlt hundert neue Wörter, die ich nicht kannte.</textarea>
+            <p class="ed-label">Excerpt (short preview line)</p>
+            <textarea class="ed-excerpt" rows="2" placeholder="A short sentence for the preview…"></textarea>
 
-            <p class="ed-label">Body (Inhalt)</p>
+            <p class="ed-label">Body</p>
             <div class="ed-toolbar">
               <button title="Bold"><strong>B</strong></button>
               <button title="Italic"><em>I</em></button>
@@ -328,11 +288,7 @@ body{ background:var(--cream-deep); }
               <button title="List">≣</button>
               <button title="Link">🔗</button>
             </div>
-            <textarea class="ed-body" placeholder="Schreibe deinen Eintrag…">Heute war der erste richtig warme Tag des Jahres. Ich saß im Park, hörte den Leuten zu und schrieb mir jedes Wort auf, das ich nicht verstand. Am Ende hatte ich eine ganze Seite voll.
-
-„Knospe“. „Amsel“. „Sonnenstrahl“. Worte, die im Winter geschlafen hatten und jetzt alle gleichzeitig aufwachten.
-
-Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf einer Bank, mit einer Liste voller neuer Wörter und der Sonne im Gesicht.</textarea>
+            <textarea class="ed-body" placeholder="Write your entry in German…"></textarea>
           </div>
 
           <!-- right rail -->
@@ -341,7 +297,7 @@ Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf 
               <h3>Publish</h3>
               <div class="pub-line"><span>Status</span><span class="seg"><button class="on">Draft</button><button>Live</button></span></div>
               <div class="pub-line"><span>Visibility</span><strong>Public</strong></div>
-              <div class="pub-line"><span>Date</span><strong id="pubDateLabel">Heute</strong></div>
+              <div class="pub-line"><span>Date</span><strong id="pubDateLabel">Today</strong></div>
               <label class="sched-toggle" onclick="toggleSchedule(this)">
                 <span class="switch"></span>
                 Publish later
@@ -365,12 +321,6 @@ Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf 
                 Set as post thumbnail
               </label>
               <p class="upload-hint">JPG or PNG · used as the cover on the home page, archive cards, and the entry header.</p>
-            </div>
-
-            <div class="rail-box">
-              <h3>Tags</h3>
-              <input class="tag-input" type="text" placeholder="Tag hinzufügen + Enter">
-              <div class="tag-chips"><span>#Frühling</span><span>#Wörter</span><span>#Park</span></div>
             </div>
           </aside>
 
