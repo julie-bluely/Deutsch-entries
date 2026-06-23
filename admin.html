@@ -69,7 +69,7 @@ body{ background:var(--cream-deep); }
 .field input, .field textarea, .field select{ width:100%; border:1.5px solid var(--line); border-radius:10px; background:var(--cream); padding:11px 13px; font-family:var(--sans); font-size:15px; color:var(--ink); outline:none; }
 .field textarea{ resize:vertical; line-height:1.6; }
 .field input:focus, .field textarea:focus, .field select:focus{ border-color:var(--terra-soft); }
-.set-hero{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.set-hero{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
 .set-hero .sh-slot{ height:130px; border:2px dashed var(--terra-soft); border-radius:12px; overflow:hidden; background:var(--cream); }
 .set-hero .sh-slot image-slot{ width:100%; height:100%; }
 .set-hero .sh-cap{ font-size:12px; color:var(--ink-faint); margin-top:8px; text-align:center; }
@@ -171,6 +171,12 @@ body{ background:var(--cream-deep); }
 .tag-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
 .tag-chips span{ background:var(--cream-deep); color:var(--ink-soft); font-size:12.5px; padding:5px 12px; border-radius:999px; }
 
+/* media library */
+.media-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px; }
+.media-cell{ display:block; aspect-ratio:1/1; border-radius:12px; overflow:hidden; border:1px solid var(--paper-edge); background:var(--cream); box-shadow:var(--shadow-soft); }
+.media-cell img{ width:100%; height:100%; object-fit:cover; transition:transform .4s; }
+.media-cell:hover img{ transform:scale(1.05); }
+
 .mobile-warn{ display:none; }
 @media (max-width:1024px){ .stats{ grid-template-columns:repeat(2,1fr); } .editor{ grid-template-columns:1fr; } .rail{ position:static; } }
 @media (max-width:760px){
@@ -194,7 +200,7 @@ body{ background:var(--cream-deep); }
       <button data-view="dash" class="active" onclick="showView('dash',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg></span> Dashboard</button>
       <button data-view="write" onclick="showView('write',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></span> New entry</button>
       <button data-view="dash" onclick="showView('dash',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><circle cx="3.8" cy="6" r="1"></circle><circle cx="3.8" cy="12" r="1"></circle><circle cx="3.8" cy="18" r="1"></circle></svg></span> All entries</button>
-      <button onclick="return false"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="m21 16-5-5L5 20"></path></svg></span> Media</button>
+      <button data-view="media" onclick="showView('media',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="8.5" cy="9.5" r="1.5"></circle><path d="m21 16-5-5L5 20"></path></svg></span> Media</button>
       <button data-view="settings" onclick="showView('settings',this)"><span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg></span> Settings</button>
     </nav>
     <div class="s-foot">
@@ -209,7 +215,7 @@ body{ background:var(--cream-deep); }
     <!-- DASHBOARD VIEW -->
     <section id="view-dash">
       <div class="topbar">
-        <h1>Guten Tag, <em>Autorin</em></h1>
+        <h1>Welcome back, <em>Autorin</em></h1>
         <div class="t-actions">
           <button class="btn btn-primary" onclick="showView('write')">+ New entry</button>
           <div class="user-pill"><span class="av"><image-slot id="author-portrait" shape="rect" placeholder="You"></image-slot></span></div>
@@ -218,10 +224,10 @@ body{ background:var(--cream-deep); }
 
       <div class="panel">
         <div class="stats">
-          <div class="stat-card"><div class="n">38</div><div class="l">Published</div><div class="d">+3 this month</div></div>
-          <div class="stat-card"><div class="n">2</div><div class="l">Drafts</div><div class="d">1 ready to review</div></div>
-          <div class="stat-card"><div class="n">B1</div><div class="l">Current level</div><div class="d">↑ from A2</div></div>
-          <div class="stat-card"><div class="n">1.4k</div><div class="l">Reads / month</div><div class="d">+12%</div></div>
+          <div class="stat-card"><div class="n" id="dashPub">0</div><div class="l">Published</div><div class="d"></div></div>
+          <div class="stat-card"><div class="n" id="dashDraft">0</div><div class="l">Drafts</div><div class="d"></div></div>
+          <div class="stat-card"><div class="n" id="dashLevel">A2</div><div class="l">Current level</div><div class="d"></div></div>
+          <div class="stat-card"><div class="n" id="dashTotal">0</div><div class="l">Total entries</div><div class="d"></div></div>
         </div>
 
         <div class="panel-head">
@@ -305,7 +311,7 @@ body{ background:var(--cream-deep); }
             <input class="ed-title" type="text" placeholder="Titel des Eintrags…" value="Frühling, oder: zu viele neue Wörter">
             <div class="ed-meta-row">
               <select class="ed-cat">
-                <option>Leben</option><option>Sprache</option><option>Kultur</option><option>Reisen</option><option>Küche</option>
+                <option>Life</option><option>Language</option><option>Culture</option><option>Travel</option><option>Food</option>
               </select>
               <span class="ed-de-flag">● Geschrieben auf Deutsch</span>
             </div>
@@ -388,10 +394,10 @@ Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf 
           <div class="set-box">
             <h3>Blog identity</h3>
             <p class="h-sub">The name and line that appear across the site.</p>
-            <div class="field"><label>Site title</label><input type="text" value="Deutsch Entries"></div>
-            <div class="field"><label>Tagline</label><input type="text" value="A diary of learning German, one cultural detour at a time."></div>
+            <div class="field"><label>Site title</label><input id="setTitle" type="text" value="Deutsch Entries"></div>
+            <div class="field"><label>Tagline</label><input id="setTagline" type="text" value="A diary of learning German, one cultural detour at a time."></div>
             <div class="field"><label>Current level</label>
-              <select><option>A1</option><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option></select>
+              <select id="setLevel"><option>A1</option><option selected>A2</option><option>B1</option><option>B2</option><option>C1</option></select>
             </div>
           </div>
 
@@ -399,29 +405,30 @@ Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf 
             <h3>Author</h3>
             <p class="h-sub">Shown on the About page and post bylines.</p>
             <div class="set-portrait">
-              <div class="sp-img"><image-slot id="set-portrait" shape="rect" placeholder="Portrait"></image-slot></div>
+              <div class="sp-img upload-slot" data-col="portrait_url"><image-slot id="set-portrait" shape="rect" placeholder="Portrait"></image-slot></div>
               <div style="flex:1">
-                <div class="field" style="margin-bottom:12px"><label>Display name</label><input type="text" value="die Autorin"></div>
+                <div class="field" style="margin-bottom:12px"><label>Display name</label><input id="setName" type="text" value="die Autorin"></div>
               </div>
             </div>
-            <div class="field" style="margin-top:16px"><label>Short bio</label><textarea rows="3">Eine Lernende, kein Profi. Ich schreibe dieses Tagebuch, um mein Deutsch zu üben — Korrekturen sind herzlich willkommen.</textarea></div>
+            <div class="field" style="margin-top:16px"><label>Short bio</label><textarea id="setBio" rows="3">Eine Lernende, kein Profi. Ich schreibe dieses Tagebuch, um mein Deutsch zu üben — Korrekturen sind herzlich willkommen.</textarea></div>
           </div>
 
           <div class="set-box full">
             <h3>Home hero images</h3>
-            <p class="h-sub">The fixed collage on the home page — set once, used as site dressing (separate from per-post thumbnails).</p>
+            <p class="h-sub">The fixed collage on the home page — set once, used as site dressing (separate from per-post thumbnails). Only you, signed in, can change these; visitors can only view them.</p>
             <div class="set-hero">
-              <div><div class="sh-slot"><image-slot id="set-hero-rug" shape="rect" placeholder="Persian rug"></image-slot></div><div class="sh-cap">Rug texture</div></div>
-              <div><div class="sh-slot"><image-slot id="set-hero-arch" shape="rect" placeholder="Cathedral / castle"></image-slot></div><div class="sh-cap">Architecture</div></div>
-              <div><div class="sh-slot"><image-slot id="set-hero-citrus" shape="rect" placeholder="Lemon"></image-slot></div><div class="sh-cap">Citrus accent</div></div>
+              <div><div class="sh-slot upload-slot" data-col="hero_arch_url"><image-slot id="set-hero-arch" shape="rect" placeholder="Cathedral / castle"></image-slot></div><div class="sh-cap">Architecture</div></div>
+              <div><div class="sh-slot upload-slot" data-col="hero_round_url"><image-slot id="set-hero-round" shape="rect" placeholder="Persian rug"></image-slot></div><div class="sh-cap">Rug detail</div></div>
+              <div><div class="sh-slot upload-slot" data-col="hero_rug_url"><image-slot id="set-hero-rug" shape="rect" placeholder="Stonework"></image-slot></div><div class="sh-cap">Stonework</div></div>
+              <div><div class="sh-slot upload-slot" data-col="hero_citrus_url"><image-slot id="set-hero-citrus" shape="rect" placeholder="Lemon"></image-slot></div><div class="sh-cap">Lemon</div></div>
             </div>
           </div>
 
           <div class="set-box full">
             <h3>Links</h3>
-            <p class="h-sub">Optional — shown in the footer.</p>
-            <div class="field"><label>Instagram</label><input type="text" placeholder="https://instagram.com/…"></div>
-            <div class="field"><label>Email</label><input type="text" value="hallo@deutschentries.de"></div>
+            <p class="h-sub">Optional — saved with your settings.</p>
+            <div class="field"><label>Instagram</label><input id="setInstagram" type="text" placeholder="https://instagram.com/…"></div>
+            <div class="field"><label>Email</label><input id="setEmail" type="text" placeholder="hallo@deutschentries.de"></div>
           </div>
 
         </div>
@@ -429,6 +436,20 @@ Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf 
           <button class="btn btn-ghost" onclick="showView('dash')">Cancel</button>
           <button class="btn btn-primary">Save changes</button>
         </div>
+      </div>
+    </section>
+
+    <!-- MEDIA VIEW -->
+    <section id="view-media" hidden>
+      <div class="topbar">
+        <h1>Media <em>library</em></h1>
+        <div class="t-actions">
+          <button class="btn btn-primary" onclick="showView('write')">+ New entry</button>
+        </div>
+      </div>
+      <div class="panel">
+        <p style="color:var(--ink-soft);margin-bottom:20px;font-size:14.5px">Every image you've uploaded with an entry. Click one to open it full size.</p>
+        <div id="mediaGrid" class="media-grid"></div>
       </div>
     </section>
 
@@ -470,7 +491,7 @@ Ich glaube, eine Sprache lernt man nicht nur im Buch, sondern auch im Park, auf 
 <script src="js/shared.js"></script>
 <script>
 function showView(v, el){
-  ['dash','write','settings'].forEach(function(name){
+  ['dash','write','settings','media'].forEach(function(name){
     var sec = document.getElementById('view-' + name);
     if(sec) sec.hidden = (name !== v);
   });

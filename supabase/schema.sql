@@ -81,4 +81,32 @@ create policy "admin can delete images"
   to authenticated
   using ( bucket_id = 'post-images' );
 
--- Done. Your backend is ready for Claude Code to wire up.
+-- 4) Settings (single row) — level, tagline, bio, hero images ----
+create table if not exists settings (
+  id             int primary key default 1,
+  site_title     text default 'Deutsch Entries',
+  tagline        text default 'A diary of learning German, one cultural detour at a time.',
+  level          text default 'A2',
+  author_name    text default 'die Autorin',
+  author_bio     text default 'Eine Lernende, kein Profi. Ich schreibe dieses Tagebuch, um mein Deutsch zu üben — Korrekturen sind herzlich willkommen.',
+  instagram      text default '',
+  email          text default '',
+  hero_arch_url  text,
+  hero_round_url text,
+  hero_rug_url   text,
+  hero_citrus_url text,
+  portrait_url   text,
+  updated_at     timestamptz default now(),
+  constraint settings_singleton check (id = 1)
+);
+insert into settings (id) values (1) on conflict (id) do nothing;
+
+alter table settings enable row level security;
+drop policy if exists "anyone can read settings" on settings;
+drop policy if exists "admin can update settings" on settings;
+drop policy if exists "admin can insert settings" on settings;
+create policy "anyone can read settings" on settings for select to anon, authenticated using ( true );
+create policy "admin can update settings" on settings for update to authenticated using ( true ) with check ( true );
+create policy "admin can insert settings" on settings for insert to authenticated with check ( true );
+
+-- Done. Your backend is ready.

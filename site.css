@@ -138,8 +138,9 @@ p{ margin:0 0 1.1em; }
 .nav-login{
   display:inline-flex; align-items:center; gap:8px;
   border:1.5px solid var(--ink); color:var(--ink);
-  padding:12px 35px; border-radius:999px; font-size:12px; font-weight:600;
-  letter-spacing:.12em; text-transform:uppercase; transition:.2s;
+  padding:11px 24px; border-radius:999px; font-size:12px; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase; transition:.2s;
+  line-height:1;
 }
 .nav-login:hover{ background:var(--ink); color:var(--cream); }
 .nav-search{ font-size:17px !important; letter-spacing:0 !important; line-height:1; padding:4px 2px !important; color:var(--ink-soft); }
@@ -151,7 +152,14 @@ p{ margin:0 0 1.1em; }
   .nav-toggle{
     display:inline-flex; border:1.5px solid var(--ink); border-radius:999px;
     padding:8px 14px; font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    background:transparent; cursor:pointer;
   }
+  /* mobile menu opens at the same breakpoint the toggle appears */
+  .mobile-menu.open{
+    display:flex !important; position:fixed; inset:0; z-index:100;
+    background:rgba(43,33,26,.96); flex-direction:column; align-items:center; justify-content:center; gap:28px;
+  }
+  .mobile-menu.open a{ color:var(--cream); font-family:var(--serif); font-size:1.8rem; letter-spacing:.03em; }
 }
 
 /* ============================================================

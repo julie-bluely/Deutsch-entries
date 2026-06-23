@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"aec4eec8a80d","js/auth.js":"6efed58365ea","js/public.js":"bf9f6e8385fa","js/shared.js":"6ca23587155a","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"729259e189a5","js/auth.js":"6efed58365ea","js/public.js":"a9bbc4e0f4f4","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -657,31 +657,37 @@ try { (() => {
 try { (() => {
 // ============================================================
 //  Admin — Deutsch Entries
-//  Loads real posts, wires create / edit / delete / publish /
-//  schedule / image upload. Falls back to the built-in sample
-//  rows when Supabase keys aren't set yet (design preview).
+//  Real posts list, create / edit / delete / publish / schedule,
+//  image upload, Settings (save + image uploads), Media library,
+//  and a working editor toolbar. Falls back to the static sample
+//  UI when Supabase keys aren't set yet.
 // ============================================================
 (function () {
-  if (!document.querySelector(".admin")) return; // not the admin page
-  if (!window.SUPABASE_CONFIGURED || !window.db) return; // keep sample UI as-is
-  var db = window.db;
+  if (!document.querySelector(".admin")) return;
   var H = window.DE;
-  var editingId = null; // null = writing a new post
-  var pendingImageFile = null; // a freshly picked image not yet uploaded
-  var pendingImageExistingUrl = null; // thumb already on the post being edited
 
-  // run once the session guard confirms we're logged in
+  // editor toolbar works even before login (pure text editing)
+  wireToolbar();
+  if (!window.SUPABASE_CONFIGURED || !window.db) return;
+  var db = window.db;
+  var editingId = null;
+  var pendingImageFile = null;
+  var pendingImageExistingUrl = null;
+  var pendingSettings = {}; // settings image URLs picked but not yet saved
+  var currentLevel = "A2";
   if (window.__ADMIN_SESSION) start();else document.addEventListener("admin-authed", start);
   function start() {
     overlayUploader();
     wireEditorButtons();
     wireNewEntryButtons();
     wireDeleteModal();
-    wireStatusSegment();
+    wireSettings();
+    wireMedia();
+    loadSettingsIntoUI();
     loadPosts();
   }
 
-  // ---------- LOAD + RENDER THE DASHBOARD LIST ----------
+  // ---------- POSTS ----------
   function loadPosts() {
     db.from("posts").select("*").order("publish_at", {
       ascending: false
@@ -696,24 +702,21 @@ try { (() => {
   function renderRows(posts) {
     var container = document.querySelector(".posts");
     if (!container) return;
-    var head = container.querySelector(".post-row.head");
     var empty = document.getElementById("postsEmpty");
-
-    // remove existing data rows (keep header + empty state)
     container.querySelectorAll(".post-row:not(.head)").forEach(function (r) {
       r.remove();
     });
-    var placeholderSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + '<rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>';
+    var ph = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg>';
     posts.forEach(function (p) {
       var isPub = p.status === "published";
       var row = document.createElement("div");
       row.className = "post-row";
       row.setAttribute("data-status", isPub ? "pub" : "draft");
       row.dataset.id = p.id;
-      var thumb = p.thumb_url ? '<img src="' + H.esc(p.thumb_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : placeholderSvg;
+      var thumb = p.thumb_url ? '<img src="' + H.esc(p.thumb_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : ph;
       var badge = isPub ? '<span class="badge pub">Published</span>' : '<span class="badge draft">Draft</span>';
       var dateTxt = isPub ? H.formatDateDE(p.publish_at) : "—";
-      row.innerHTML = '<div class="pr-thumb">' + thumb + "</div>" + '<div><div class="pr-title">' + H.esc(p.title) + "</div>" + '<div class="pr-cat">' + H.esc(p.category || "") + "</div></div>" + "<span>" + badge + "</span>" + '<span class="pr-date">' + dateTxt + "</span>" + '<div class="pr-actions">' + '<button class="pr-edit">Edit</button>' + '<button class="pr-del">Delete</button></div>';
+      row.innerHTML = '<div class="pr-thumb">' + thumb + "</div>" + '<div><div class="pr-title">' + H.esc(p.title) + "</div>" + '<div class="pr-cat">' + H.esc(p.category || "") + "</div></div>" + "<span>" + badge + "</span>" + '<span class="pr-date">' + dateTxt + "</span>" + '<div class="pr-actions"><button class="pr-edit">Edit</button><button class="pr-del">Delete</button></div>';
       row.querySelector(".pr-edit").addEventListener("click", function () {
         editPost(p);
       });
@@ -723,11 +726,8 @@ try { (() => {
       if (empty) container.insertBefore(row, empty);else container.appendChild(row);
     });
     updateStats(posts);
-
-    // reset the All/Published/Drafts filter to "All"
     if (typeof window.filterPosts === "function") {
-      var allTab = document.querySelector('.filter-tabs .ftab[data-status="all"]');
-      window.filterPosts("all", allTab);
+      window.filterPosts("all", document.querySelector('.filter-tabs .ftab[data-status="all"]'));
     }
   }
   function updateStats(posts) {
@@ -735,12 +735,13 @@ try { (() => {
       return p.status === "published";
     }).length;
     var draft = posts.length - pub;
-    var cards = document.querySelectorAll(".stats .stat-card .n");
-    if (cards[0]) cards[0].textContent = pub;
-    if (cards[1]) cards[1].textContent = draft;
+    setText("#dashPub", String(pub));
+    setText("#dashDraft", String(draft));
+    setText("#dashTotal", String(posts.length));
+    setText("#dashLevel", currentLevel);
   }
 
-  // ---------- DELETE (reuses the existing #delModal) ----------
+  // ---------- DELETE ----------
   var deleteTargetId = null;
   function askDelete(p) {
     deleteTargetId = p.id;
@@ -753,34 +754,27 @@ try { (() => {
     var modal = document.getElementById("delModal");
     if (!modal) return;
     var confirmBtn = modal.querySelector(".btn-danger");
-    if (confirmBtn) {
-      confirmBtn.onclick = function () {
-        if (!deleteTargetId) {
-          modal.hidden = true;
-          return;
-        }
-        db.from("posts").delete().eq("id", deleteTargetId).then(function (res) {
-          if (res.error) {
-            alert("Could not delete: " + res.error.message);
-          }
-          deleteTargetId = null;
-          modal.hidden = true;
-          loadPosts();
-        });
-      };
-    }
+    if (confirmBtn) confirmBtn.onclick = function () {
+      if (!deleteTargetId) {
+        modal.hidden = true;
+        return;
+      }
+      db.from("posts").delete().eq("id", deleteTargetId).then(function (res) {
+        if (res.error) alert("Could not delete: " + res.error.message);
+        deleteTargetId = null;
+        modal.hidden = true;
+        loadPosts();
+      });
+    };
   }
 
-  // ---------- NEW ENTRY ----------
+  // ---------- NEW / EDIT ----------
   function wireNewEntryButtons() {
-    // sidebar "New entry" + topbar "+ New entry"
     document.querySelectorAll('[data-view="write"]').forEach(function (b) {
       b.addEventListener("click", resetEditor);
     });
     document.querySelectorAll(".topbar .btn-primary").forEach(function (b) {
-      if ((b.textContent || "").indexOf("New entry") !== -1) {
-        b.addEventListener("click", resetEditor);
-      }
+      if ((b.textContent || "").indexOf("New entry") !== -1) b.addEventListener("click", resetEditor);
     });
   }
   function resetEditor() {
@@ -793,12 +787,9 @@ try { (() => {
     var cat = document.querySelector(".ed-cat");
     if (cat) cat.selectedIndex = 0;
     var slot = document.getElementById("editor-featured");
-    if (slot) slot.removeAttribute("src");
-    var titleEl = document.querySelector("#view-write .topbar h1");
-    if (titleEl) titleEl.innerHTML = "Write a <em>new entry</em>";
+    if (slot && slot.removeAttribute) slot.removeAttribute("src");
+    setHTML("#view-write .topbar h1", "Write a <em>new entry</em>");
   }
-
-  // ---------- EDIT ----------
   function editPost(p) {
     editingId = p.id;
     pendingImageFile = null;
@@ -807,39 +798,23 @@ try { (() => {
     setVal(".ed-excerpt", p.excerpt || "");
     setVal(".ed-body", p.body || "");
     var cat = document.querySelector(".ed-cat");
-    if (cat) {
-      Array.prototype.forEach.call(cat.options, function (o, i) {
-        if (o.value === p.category || o.textContent === p.category) cat.selectedIndex = i;
-      });
-    }
-    var slot = document.getElementById("editor-featured");
-    if (slot) {
-      if (p.thumb_url) slot.setAttribute("src", p.thumb_url);else slot.removeAttribute("src");
-    }
-    var titleEl = document.querySelector("#view-write .topbar h1");
-    if (titleEl) titleEl.innerHTML = "Edit <em>entry</em>";
+    if (cat) Array.prototype.forEach.call(cat.options, function (o, i) {
+      if (o.value === p.category || o.textContent === p.category) cat.selectedIndex = i;
+    });
+    setHTML("#view-write .topbar h1", "Edit <em>entry</em>");
     if (typeof window.showView === "function") window.showView("write");
   }
 
-  // ---------- IMAGE UPLOAD OVERLAY ----------
-  // <image-slot> is read-only outside the design tool, so we lay a real
-  // file input over the dropzone and preview via the slot's src attribute.
+  // ---------- FEATURED IMAGE UPLOAD ----------
   function overlayUploader() {
     var zone = document.querySelector(".dropzone");
     if (!zone) return;
-    zone.style.position = "relative";
-    var input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/png,image/jpeg,image/webp";
-    input.style.cssText = "position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5;";
-    zone.appendChild(input);
+    var input = makeFileInput(zone);
     input.addEventListener("change", function () {
       var f = input.files && input.files[0];
       if (!f) return;
       pendingImageFile = f;
-      var url = URL.createObjectURL(f);
-      var slot = document.getElementById("editor-featured");
-      if (slot) slot.setAttribute("src", url);
+      previewInto(document.getElementById("editor-featured"), URL.createObjectURL(f));
     });
   }
   function thumbnailToggleOn() {
@@ -847,52 +822,25 @@ try { (() => {
     return sw ? sw.classList.contains("on") : true;
   }
 
-  // ---------- STATUS SEGMENT (Draft / Live) ----------
-  function wireStatusSegment() {
-    var seg = document.querySelector(".rail-box .seg");
-    if (!seg) return;
-    seg.querySelectorAll("button").forEach(function (b) {
-      b.addEventListener("click", function () {
-        seg.querySelectorAll("button").forEach(function (x) {
-          x.classList.remove("on");
-        });
-        b.classList.add("on");
-      });
-    });
-  }
-
-  // ---------- PUBLISH / SAVE DRAFT ----------
+  // ---------- PUBLISH / SAVE ----------
   function wireEditorButtons() {
     var write = document.getElementById("view-write");
     if (!write) return;
     write.querySelectorAll("button").forEach(function (b) {
       var txt = (b.textContent || "").trim().toLowerCase();
-      if (txt.indexOf("save draft") !== -1) {
-        b.addEventListener("click", function (e) {
-          e.preventDefault();
-          savePost("draft", b);
-        });
-      } else if (txt.indexOf("publish") !== -1) {
-        b.addEventListener("click", function (e) {
-          e.preventDefault();
-          savePost("published", b);
-        });
-      }
+      if (txt.indexOf("save draft") !== -1) b.addEventListener("click", function (e) {
+        e.preventDefault();
+        savePost("draft", b);
+      });else if (txt.indexOf("publish") !== -1) b.addEventListener("click", function (e) {
+        e.preventDefault();
+        savePost("published", b);
+      });
     });
   }
-  function getVal(sel) {
-    var el = document.querySelector(sel);
-    return el ? (el.value || "").trim() : "";
-  }
-  function setVal(sel, v) {
-    var el = document.querySelector(sel);
-    if (el) el.value = v;
-  }
   function chosenPublishAt() {
-    var schedSwitch = document.querySelector(".sched-toggle .switch");
-    var on = schedSwitch && schedSwitch.classList.contains("on");
+    var sw = document.querySelector(".sched-toggle .switch");
     var input = document.getElementById("schedInput");
-    if (on && input && input.value) return new Date(input.value).toISOString();
+    if (sw && sw.classList.contains("on") && input && input.value) return new Date(input.value).toISOString();
     return new Date().toISOString();
   }
   function savePost(status, btn) {
@@ -902,7 +850,7 @@ try { (() => {
       return;
     }
     var body = getVal(".ed-body");
-    var category = getVal(".ed-cat") || "Leben";
+    var category = getVal(".ed-cat") || "Life";
     var excerpt = getVal(".ed-excerpt") || H.autoExcerpt(body);
     var label = btn ? btn.innerHTML : "";
     if (btn) {
@@ -916,9 +864,8 @@ try { (() => {
       }
     }
     maybeUploadImage().then(function (thumbUrl) {
-      var record = {
+      var rec = {
         title: title,
-        slug: H.slugify(title) + "-" + Date.now().toString(36),
         category: category,
         body: body,
         excerpt: excerpt,
@@ -926,15 +873,14 @@ try { (() => {
         status: status,
         publish_at: chosenPublishAt()
       };
-      if (thumbUrl) record.thumb_url = thumbUrl;
+      if (thumbUrl) rec.thumb_url = thumbUrl;
       var op;
       if (editingId) {
-        // don't regenerate slug on edit; keep image if none re-picked
-        delete record.slug;
-        if (!thumbUrl && pendingImageExistingUrl) record.thumb_url = pendingImageExistingUrl;
-        op = db.from("posts").update(record).eq("id", editingId);
+        if (!thumbUrl && pendingImageExistingUrl) rec.thumb_url = pendingImageExistingUrl;
+        op = db.from("posts").update(rec).eq("id", editingId);
       } else {
-        op = db.from("posts").insert(record);
+        rec.slug = H.slugify(title) + "-" + Date.now().toString(36);
+        op = db.from("posts").insert(rec);
       }
       op.then(function (res) {
         restore();
@@ -951,20 +897,226 @@ try { (() => {
       alert("Image upload failed: " + (err && err.message ? err.message : err));
     });
   }
-
-  // returns a Promise<string|null> with the public thumb URL
   function maybeUploadImage() {
     if (!pendingImageFile || !thumbnailToggleOn()) return Promise.resolve(null);
-    var f = pendingImageFile;
-    var ext = (f.name.split(".").pop() || "jpg").toLowerCase();
+    return uploadToBucket(pendingImageFile);
+  }
+
+  // ---------- SETTINGS ----------
+  function loadSettingsIntoUI() {
+    H.loadSettings(db).then(function (s) {
+      if (!s) return;
+      currentLevel = s.level || "A2";
+      setVal("#setTitle", s.site_title || "");
+      setVal("#setTagline", s.tagline || "");
+      selectVal("#setLevel", s.level || "A2");
+      setVal("#setName", s.author_name || "");
+      setVal("#setBio", s.author_bio || "");
+      setVal("#setInstagram", s.instagram || "");
+      setVal("#setEmail", s.email || "");
+      previewInto(document.getElementById("set-hero-arch"), s.hero_arch_url);
+      previewInto(document.getElementById("set-hero-round"), s.hero_round_url);
+      previewInto(document.getElementById("set-hero-rug"), s.hero_rug_url);
+      previewInto(document.getElementById("set-hero-citrus"), s.hero_citrus_url);
+      previewInto(document.getElementById("set-portrait"), s.portrait_url);
+      setText("#dashLevel", currentLevel);
+    });
+  }
+  function wireSettings() {
+    // image upload slots
+    document.querySelectorAll(".upload-slot[data-col]").forEach(function (slotWrap) {
+      var col = slotWrap.getAttribute("data-col");
+      var input = makeFileInput(slotWrap);
+      input.addEventListener("change", function () {
+        var f = input.files && input.files[0];
+        if (!f) return;
+        previewInto(slotWrap.querySelector("image-slot, img"), URL.createObjectURL(f));
+        uploadToBucket(f).then(function (url) {
+          pendingSettings[col] = url;
+        }).catch(function (e) {
+          alert("Upload failed: " + (e.message || e));
+        });
+      });
+    });
+    // save buttons (topbar + bottom of settings)
+    document.querySelectorAll("#view-settings .btn-primary").forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.preventDefault();
+        saveSettings(b);
+      });
+    });
+  }
+  function saveSettings(btn) {
+    var rec = {
+      id: 1,
+      site_title: getVal("#setTitle"),
+      tagline: getVal("#setTagline"),
+      level: getVal("#setLevel") || "A2",
+      author_name: getVal("#setName"),
+      author_bio: getVal("#setBio"),
+      instagram: getVal("#setInstagram"),
+      email: getVal("#setEmail"),
+      updated_at: new Date().toISOString()
+    };
+    Object.keys(pendingSettings).forEach(function (k) {
+      rec[k] = pendingSettings[k];
+    });
+    var label = btn ? btn.innerHTML : "";
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = "Saving…";
+    }
+    db.from("settings").upsert(rec, {
+      onConflict: "id"
+    }).then(function (res) {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = label;
+      }
+      if (res.error) {
+        alert("Could not save settings: " + res.error.message);
+        return;
+      }
+      currentLevel = rec.level;
+      setText("#dashLevel", currentLevel);
+      pendingSettings = {};
+      flash(btn, "Saved ✓");
+    });
+  }
+
+  // ---------- MEDIA ----------
+  var mediaLoaded = false;
+  function wireMedia() {
+    document.querySelectorAll('[data-view="media"]').forEach(function (b) {
+      b.addEventListener("click", function () {
+        loadMedia();
+      });
+    });
+  }
+  function loadMedia() {
+    var grid = document.getElementById("mediaGrid");
+    if (!grid || mediaLoaded) return;
+    grid.innerHTML = '<p style="color:var(--ink-faint);font-size:14px">Loading…</p>';
+    db.storage.from("post-images").list("posts", {
+      limit: 100,
+      sortBy: {
+        column: "created_at",
+        order: "desc"
+      }
+    }).then(function (res) {
+      if (res.error) {
+        grid.innerHTML = '<p style="color:var(--ink-faint)">Could not load media.</p>';
+        return;
+      }
+      var files = (res.data || []).filter(function (f) {
+        return f.name && !f.name.startsWith(".");
+      });
+      if (!files.length) {
+        grid.innerHTML = '<p style="color:var(--ink-faint);font-size:14px">No images yet. Upload one when writing an entry.</p>';
+        return;
+      }
+      grid.innerHTML = files.map(function (f) {
+        var url = db.storage.from("post-images").getPublicUrl("posts/" + f.name).data.publicUrl;
+        return '<a class="media-cell" href="' + url + '" target="_blank" rel="noopener"><img src="' + url + '" alt=""></a>';
+      }).join("");
+      mediaLoaded = true;
+    });
+  }
+
+  // ---------- editor toolbar (markdown) ----------
+  function wireToolbar() {
+    var tb = document.querySelector(".ed-toolbar");
+    if (!tb) return;
+    var body = document.querySelector(".ed-body");
+    tb.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.preventDefault();
+        var t = (b.getAttribute("title") || "").toLowerCase();
+        if (t === "bold") wrapSel(body, "**", "**");else if (t === "italic") wrapSel(body, "*", "*");else if (t === "heading") linePrefix(body, "## ");else if (t === "quote") linePrefix(body, "> ");else if (t === "list") linePrefix(body, "- ");else if (t === "link") {
+          var u = prompt("Link URL:", "https://");
+          if (u) wrapSel(body, "[", "](" + u + ")");
+        }
+        body.focus();
+      });
+    });
+  }
+  function wrapSel(ta, before, after) {
+    if (!ta) return;
+    var s = ta.selectionStart,
+      e = ta.selectionEnd,
+      v = ta.value;
+    var sel = v.slice(s, e) || "Text";
+    ta.value = v.slice(0, s) + before + sel + after + v.slice(e);
+    ta.selectionStart = s + before.length;
+    ta.selectionEnd = s + before.length + sel.length;
+  }
+  function linePrefix(ta, prefix) {
+    if (!ta) return;
+    var s = ta.selectionStart,
+      v = ta.value;
+    var lineStart = v.lastIndexOf("\n", s - 1) + 1;
+    ta.value = v.slice(0, lineStart) + prefix + v.slice(lineStart);
+    ta.selectionStart = ta.selectionEnd = s + prefix.length;
+  }
+
+  // ---------- shared upload + helpers ----------
+  function uploadToBucket(file) {
+    var ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     var path = "posts/" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
-    return db.storage.from("post-images").upload(path, f, {
+    return db.storage.from("post-images").upload(path, file, {
       upsert: false
     }).then(function (res) {
       if (res.error) throw res.error;
-      var pub = db.storage.from("post-images").getPublicUrl(path);
-      return pub.data.publicUrl;
+      return db.storage.from("post-images").getPublicUrl(path).data.publicUrl;
     });
+  }
+  function makeFileInput(host) {
+    host.style.position = "relative";
+    var input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/png,image/jpeg,image/webp";
+    input.style.cssText = "position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:5;";
+    host.appendChild(input);
+    return input;
+  }
+  function previewInto(slotOrImg, url) {
+    if (!slotOrImg || !url) return;
+    if (slotOrImg.tagName === "IMG") {
+      slotOrImg.src = url;
+      return;
+    }
+    if (slotOrImg.setAttribute) slotOrImg.setAttribute("src", url);
+  }
+  function flash(btn, msg) {
+    if (!btn) return;
+    var old = btn.innerHTML;
+    btn.innerHTML = msg;
+    setTimeout(function () {
+      btn.innerHTML = old;
+    }, 1400);
+  }
+  function getVal(sel) {
+    var el = document.querySelector(sel);
+    return el ? (el.value || "").trim() : "";
+  }
+  function setVal(sel, v) {
+    var el = document.querySelector(sel);
+    if (el) el.value = v;
+  }
+  function selectVal(sel, v) {
+    var el = document.querySelector(sel);
+    if (!el) return;
+    Array.prototype.forEach.call(el.options, function (o, i) {
+      if (o.value === v || o.textContent === v) el.selectedIndex = i;
+    });
+  }
+  function setText(sel, txt) {
+    var el = document.querySelector(sel);
+    if (el) el.textContent = txt;
+  }
+  function setHTML(sel, html) {
+    var el = document.querySelector(sel);
+    if (el) el.innerHTML = html;
   }
 })();
 })(); } catch (e) { __ds_ns.__errors.push({ path: "js/admin.js", error: String((e && e.message) || e) }); }
@@ -1078,21 +1230,36 @@ try { (() => {
 try { (() => {
 // ============================================================
 //  Public pages — Deutsch Entries
-//  Renders home, archive, and single-post from Supabase.
-//  When keys aren't set (or on any error) it leaves the
-//  hand-designed sample content in place so the site never
-//  looks broken.
+//  Renders home, archive, single-post, and the About timeline
+//  from Supabase. Falls back to the built-in sample content
+//  whenever keys aren't set or a query fails, so the site is
+//  never blank.
 // ============================================================
 (function () {
-  if (!window.SUPABASE_CONFIGURED || !window.db) return; // keep sample content
-  var db = window.db;
   var H = window.DE;
-  var isPost = !!document.querySelector("article .read-col");
+  var configured = !!(window.SUPABASE_CONFIGURED && window.db);
+  var db = window.db;
+  var isPost = !!document.querySelector(".read-col");
   var isArchive = !!document.querySelector(".masonry");
-  var isHome = !!document.querySelector(".featured") && !isPost;
-  if (isPost) renderPost();else if (isArchive) renderArchive();else if (isHome) renderHome();
+  var isAbout = !!document.getElementById("aboutTimeline");
+  var isHome = !!document.querySelector(".hero-strip");
 
-  // ---- live published posts, newest first ----
+  // ---- anti-flash: hide sample lists until real data is in ----
+  if (configured && (isArchive || isHome || isPost)) {
+    var hide = document.createElement("style");
+    hide.id = "liveHide";
+    hide.textContent = ".masonry,.grid-3,.read-col{visibility:hidden}";
+    document.head.appendChild(hide);
+  }
+  function reveal() {
+    var s = document.getElementById("liveHide");
+    if (s) s.remove();
+  }
+  if (!configured) return; // samples already in the HTML
+
+  // settings power hero images, level, portrait
+  H.loadSettings(db).then(applySettings);
+  if (isPost) renderPost();else if (isArchive) renderArchive();else if (isAbout) renderAbout();else if (isHome) renderHome();else reveal();
   function fetchPublished(limit) {
     var q = db.from("posts").select("*").eq("status", "published").lte("publish_at", new Date().toISOString()).order("publish_at", {
       ascending: false
@@ -1104,15 +1271,48 @@ try { (() => {
     return (min || 1) + " Min.";
   }
 
+  // ---------- SETTINGS (hero images, level, portrait) ----------
+  function applySettings(s) {
+    if (!s) return;
+    lockImage(document.getElementById("hero-arch"), s.hero_arch_url);
+    lockImage(document.getElementById("hero-round"), s.hero_round_url);
+    lockImage(document.getElementById("hero-rug"), s.hero_rug_url);
+    lockImage(document.getElementById("hero-lemon"), s.hero_citrus_url);
+    document.querySelectorAll("#author-portrait, #set-portrait").forEach(function (el) {
+      lockImage(el, s.portrait_url);
+    });
+    if (s.level) {
+      setText(document, "#statLevel", s.level);
+    }
+  }
+  function lockImage(slot, url) {
+    if (!slot || !url) return;
+    var img = document.createElement("img");
+    img.src = url;
+    img.alt = "";
+    img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
+    slot.replaceWith(img);
+  }
+
   // ---------------- HOME ----------------
   function renderHome() {
     fetchPublished(7).then(function (res) {
-      if (res.error || !res.data || !res.data.length) return; // keep samples
+      if (res.error || !res.data || !res.data.length) {
+        reveal();
+        return;
+      }
       var posts = res.data;
+
+      // real hero stats
+      var total = posts.length;
+      setText(document, "#statEntries", String(total));
+      // time since first (oldest) entry
+      var oldest = posts[posts.length - 1];
+      var t = H.timeSince(oldest.publish_at);
+      setText(document, "#statTimeN", String(t.n));
+      setText(document, "#statTimeL", t.label);
       var featured = posts[0];
       var rest = posts.slice(1, 7);
-
-      // ----- featured block -----
       var f = document.querySelector(".featured");
       if (f && featured) {
         var link = "post.html?slug=" + encodeURIComponent(featured.slug);
@@ -1130,63 +1330,74 @@ try { (() => {
         var readBtn = f.querySelector(".btn");
         if (readBtn) readBtn.setAttribute("href", link);
       }
-
-      // ----- recent grid -----
       var grid = document.querySelector(".grid-3");
       if (grid) {
-        grid.innerHTML = rest.map(cardHTML).join("");
-        hydrateSlots(grid, rest);
+        if (rest.length) {
+          grid.innerHTML = rest.map(function (p) {
+            return cardHTML(p);
+          }).join("");
+          hydrate(grid);
+        } else {
+          // only one post so far — hide the "Recent entries" section entirely
+          var sec = grid.closest("section");
+          if (sec) sec.style.display = "none";
+        }
       }
+      reveal();
     });
   }
 
   // ---------------- ARCHIVE ----------------
   function renderArchive() {
     fetchPublished(null).then(function (res) {
-      if (res.error || !res.data || !res.data.length) return; // keep samples
+      if (res.error || !res.data || !res.data.length) {
+        reveal();
+        return;
+      }
       var posts = res.data;
       var heights = ["h-tall", "h-mid", "h-short"];
       var masonry = document.querySelector(".masonry");
-      if (!masonry) return;
-      masonry.innerHTML = posts.map(function (p, i) {
-        return cardHTML(p, heights[i % heights.length]);
-      }).join("");
-      hydrateSlots(masonry, posts);
-
-      // update the count in the eyebrow
-      var eyebrow = document.querySelector(".arch-head .eyebrow");
-      if (eyebrow) eyebrow.textContent = "Das Archiv · " + posts.length + " Einträge";
-
-      // re-init the existing chip/search filter over the new cards
+      if (masonry) {
+        masonry.innerHTML = posts.map(function (p, i) {
+          return cardHTML(p, heights[i % heights.length]);
+        }).join("");
+        hydrate(masonry);
+      }
+      setText(document, "#archCount", "The Archive · " + posts.length + (posts.length === 1 ? " entry" : " entries"));
       if (typeof window.initArchiveFilter === "function") window.initArchiveFilter();
+      reveal();
     });
   }
-
-  // a single archive/home card (matches the existing markup)
   function cardHTML(p, heightClass) {
     var link = "post.html?slug=" + encodeURIComponent(p.slug);
     var cls = "card" + (heightClass ? " " + heightClass : "");
-    return '<a href="' + link + '" class="' + cls + '" data-cat="' + H.esc(H.catKey(p.category)) + '">' + '<div class="thumb"><span class="cat">' + H.esc(p.category || "") + "</span>" + '<image-slot shape="rect" data-thumb="' + H.esc(p.thumb_url || "") + '"></image-slot></div>' + '<div class="meta"><span>' + H.formatDateDE(p.publish_at) + "</span>·" + '<span class="de">' + readLabel(p.read_min) + "</span></div>" + "<h3>" + H.esc(p.title) + "</h3>" + '<p class="excerpt">' + H.esc(p.excerpt || H.autoExcerpt(p.body)) + "</p>" + '<span class="read">Weiterlesen →</span></a>';
+    var thumb = p.thumb_url ? '<img src="' + H.esc(p.thumb_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : '<image-slot shape="rect"></image-slot>';
+    return '<a href="' + link + '" class="' + cls + '" data-cat="' + H.esc(H.catKey(p.category)) + '">' + '<div class="thumb"><span class="cat">' + H.esc(p.category || "") + "</span>" + thumb + "</div>" + '<div class="meta"><span>' + H.formatDateDE(p.publish_at) + "</span>·" + '<span class="de">' + readLabel(p.read_min) + "</span></div>" + "<h3>" + H.esc(p.title) + "</h3>" + '<p class="excerpt">' + H.esc(p.excerpt || H.autoExcerpt(p.body)) + "</p>" + '<span class="read">Weiterlesen →</span></a>';
   }
-
-  // set image-slot src for cards that carry a data-thumb
-  function hydrateSlots(scope, posts) {
-    scope.querySelectorAll("image-slot[data-thumb]").forEach(function (slot) {
-      var u = slot.getAttribute("data-thumb");
-      if (u) slot.setAttribute("src", u);
-    });
-  }
+  function hydrate(scope) {/* images already inlined as <img> */}
   function setSlot(slot, url) {
-    if (slot && url) slot.setAttribute("src", url);
+    if (slot && url) {
+      var img = document.createElement("img");
+      img.src = url;
+      img.alt = "";
+      img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
+      slot.replaceWith(img);
+    }
   }
 
   // ---------------- SINGLE POST ----------------
   function renderPost() {
     var slug = new URLSearchParams(location.search).get("slug");
-    if (!slug) return; // no slug → keep the sample post showing
+    if (!slug) {
+      reveal();
+      return;
+    } // direct sample view
 
     db.from("posts").select("*").eq("slug", slug).eq("status", "published").limit(1).then(function (res) {
-      if (res.error) return;
+      if (res.error) {
+        reveal();
+        return;
+      }
       var p = res.data && res.data[0];
       if (!p) {
         window.location.replace("404.html");
@@ -1196,35 +1407,56 @@ try { (() => {
       setHTML(document, ".post-head h1", H.esc(p.title));
       var dek = document.querySelector(".post-head .dek");
       if (dek) dek.textContent = p.excerpt || "";
-
-      // categories row → one real category + the Auf Deutsch flag
       var cats = document.querySelector(".post-head .cats");
       if (cats) cats.innerHTML = "<span>" + H.esc(p.category || "") + "</span>";
       var crumbCat = document.querySelector(".crumb span:last-child");
       if (crumbCat) crumbCat.textContent = p.category || "";
       var when = document.querySelector(".byline .when");
       if (when) when.textContent = H.formatDateDE(p.publish_at) + " · " + readLabel(p.read_min) + " Lesezeit · auf Deutsch";
-
-      // hero image
       var hero = document.querySelector(".post-hero image-slot");
       if (hero) {
-        if (p.thumb_url) hero.setAttribute("src", p.thumb_url);else hero.removeAttribute("src");
+        if (p.thumb_url) setSlot(hero, p.thumb_url);
       }
-
-      // body → paragraphs, drop-cap on the first
       var col = document.querySelector(".read-col");
       if (col) {
-        var paras = (p.body || "").split(/\n\s*\n/).map(function (t) {
-          return t.trim();
-        }).filter(Boolean);
-        col.innerHTML = paras.map(function (t, i) {
-          return '<p' + (i === 0 ? ' class="drop"' : "") + ">" + H.esc(t) + "</p>";
-        }).join("");
+        col.innerHTML = H.mdToHtml(p.body || "");
+        var firstP = col.querySelector("p");
+        if (firstP) firstP.classList.add("drop");
       }
+      reveal();
     });
   }
 
-  // ---------- tiny DOM helpers ----------
+  // ---------------- ABOUT TIMELINE ----------------
+  function renderAbout() {
+    reveal();
+    fetchPublished(null).then(function (res) {
+      var box = document.getElementById("aboutTimeline");
+      if (!box || res.error || !res.data || !res.data.length) return;
+      var asc = res.data.slice().reverse(); // oldest → newest
+      var picks = [];
+      picks.push({
+        p: asc[0],
+        head: "The beginning"
+      });
+      if (asc.length > 2) picks.push({
+        p: asc[Math.floor(asc.length / 2)],
+        head: "Finding a rhythm"
+      });
+      if (asc.length > 1) picks.push({
+        p: asc[asc.length - 1],
+        head: "Where I am now"
+      });
+      box.innerHTML = picks.map(function (it) {
+        var d = new Date(it.p.publish_at);
+        var year = d.getFullYear();
+        var mon = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"][d.getMonth()];
+        return '<div class="tl-item">' + '<div class="tl-when">' + year + "<small>" + mon + "</small></div>" + '<div class="tl-body"><h4>' + H.esc(it.head) + "</h4>" + "<p>" + H.esc(it.p.title) + "</p></div>" + "</div>";
+      }).join("");
+    });
+  }
+
+  // ---------- helpers ----------
   function setText(scope, sel, txt) {
     var e = scope.querySelector(sel);
     if (e) e.textContent = txt;
@@ -1240,7 +1472,7 @@ try { (() => {
 try { (() => {
 // ============================================================
 //  Shared helpers — Deutsch Entries
-//  Small utilities used by admin.js and public.js.
+//  Used by admin.js and public.js.
 // ============================================================
 (function () {
   var MONTHS_DE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -1253,32 +1485,105 @@ try { (() => {
     return d.getDate() + ". " + MONTHS_DE[d.getMonth()] + " " + d.getFullYear();
   }
 
-  // umlaut-safe URL slug: "Über die Höflichkeit" -> "ueber-die-hoeflichkeit"
+  // umlaut-safe URL slug
   function slugify(title) {
     return (title || "").toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "eintrag";
   }
 
   // rough reading time in minutes (German ~200 wpm)
   function readMinutes(body) {
-    var words = (body || "").trim().split(/\s+/).filter(Boolean).length;
+    var words = (body || "").replace(/[#>*_\-]/g, " ").trim().split(/\s+/).filter(Boolean).length;
     return Math.max(1, Math.round(words / 200));
   }
-
-  // first ~160 chars as a fallback excerpt
   function autoExcerpt(body) {
-    var t = (body || "").replace(/\s+/g, " ").trim();
+    var t = (body || "").replace(/[#>*_]/g, "").replace(/\s+/g, " ").trim();
     if (t.length <= 160) return t;
     return t.slice(0, 160).replace(/\s+\S*$/, "") + "…";
   }
-
-  // escape text before inserting into HTML
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
-
-  // category label -> data-cat key used by the archive filter
   function catKey(cat) {
     return (cat || "").toLowerCase().trim();
+  }
+
+  // ---- time since first entry → friendly "X days/months in" ----
+  function timeSince(dateStr) {
+    if (!dateStr) return {
+      n: 0,
+      label: "Days in"
+    };
+    var start = new Date(dateStr),
+      now = new Date();
+    var days = Math.max(0, Math.floor((now - start) / 86400000));
+    if (days < 31) return {
+      n: days,
+      label: days === 1 ? "Day in" : "Days in"
+    };
+    var months = Math.floor(days / 30.4);
+    if (months < 24) return {
+      n: months,
+      label: months === 1 ? "Month in" : "Months in"
+    };
+    return {
+      n: Math.floor(months / 12),
+      label: "Years in"
+    };
+  }
+
+  // ---- tiny Markdown → HTML (bold, italic, ## heading, > quote, - list, [t](url)) ----
+  function mdInline(s) {
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (m, t, u) {
+      return '<a href="' + u + '" target="_blank" rel="noopener">' + t + "</a>";
+    });
+    return s;
+  }
+  function mdToHtml(text) {
+    var blocks = (text || "").replace(/\r/g, "").split(/\n{2,}/);
+    var out = [];
+    blocks.forEach(function (block) {
+      var lines = block.split("\n").filter(function (l) {
+        return l.trim() !== "";
+      });
+      if (!lines.length) return;
+      if (lines.every(function (l) {
+        return /^\s*-\s+/.test(l);
+      })) {
+        out.push("<ul>" + lines.map(function (l) {
+          return "<li>" + mdInline(esc(l.replace(/^\s*-\s+/, ""))) + "</li>";
+        }).join("") + "</ul>");
+      } else if (/^\s*>\s+/.test(lines[0])) {
+        var q = lines.map(function (l) {
+          return esc(l.replace(/^\s*>\s?/, ""));
+        }).join(" ");
+        out.push('<p class="pull">' + mdInline(q) + "</p>");
+      } else if (/^\s*##\s+/.test(lines[0])) {
+        out.push("<h2>" + mdInline(esc(lines[0].replace(/^\s*##\s+/, ""))) + "</h2>");
+        var rest = lines.slice(1).join(" ").trim();
+        if (rest) out.push("<p>" + mdInline(esc(rest)) + "</p>");
+      } else {
+        out.push("<p>" + mdInline(esc(lines.join(" "))) + "</p>");
+      }
+    });
+    return out.join("\n");
+  }
+
+  // ---- settings (cached single-row fetch) ----
+  var _settingsPromise = null;
+  function loadSettings(db) {
+    if (!db) return Promise.resolve(null);
+    if (_settingsPromise) return _settingsPromise;
+    _settingsPromise = db.from("settings").select("*").eq("id", 1).limit(1).then(function (res) {
+      if (res.error) {
+        return null;
+      } // table may not exist yet — fail soft
+      return res.data && res.data[0] || null;
+    }).catch(function () {
+      return null;
+    });
+    return _settingsPromise;
   }
   window.DE = {
     formatDateDE: formatDateDE,
@@ -1286,7 +1591,10 @@ try { (() => {
     readMinutes: readMinutes,
     autoExcerpt: autoExcerpt,
     esc: esc,
-    catKey: catKey
+    catKey: catKey,
+    timeSince: timeSince,
+    mdToHtml: mdToHtml,
+    loadSettings: loadSettings
   };
 })();
 })(); } catch (e) { __ds_ns.__errors.push({ path: "js/shared.js", error: String((e && e.message) || e) }); }

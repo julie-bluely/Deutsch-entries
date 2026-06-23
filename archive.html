@@ -67,7 +67,7 @@
 </div>
 
 <section class="wrap arch-head">
-  <span class="eyebrow center" style="justify-content:center">Das Archiv · 38 Einträge</span>
+  <span class="eyebrow center" id="archCount" style="justify-content:center">The Archive</span>
   <h1>Every <em>entry</em>, in order</h1>
   <p>The whole diary, from the first three words to the long winter essays. The short ones are early; the longer ones came as the language settled in.</p>
 </section>
@@ -75,16 +75,16 @@
 <div class="wrap">
   <div class="toolbar">
     <div class="chips">
-      <button class="chip active" data-cat="all">Alle</button>
-      <button class="chip" data-cat="sprache">Sprache</button>
-      <button class="chip" data-cat="kultur">Kultur</button>
-      <button class="chip" data-cat="reisen">Reisen</button>
-      <button class="chip" data-cat="leben">Leben</button>
-      <button class="chip" data-cat="küche">Küche</button>
+      <button class="chip active" data-cat="all">All</button>
+      <button class="chip" data-cat="language">Language</button>
+      <button class="chip" data-cat="culture">Culture</button>
+      <button class="chip" data-cat="travel">Travel</button>
+      <button class="chip" data-cat="life">Life</button>
+      <button class="chip" data-cat="food">Food</button>
     </div>
     <label class="search">
       <span>⌕</span>
-      <input id="archSearch" type="text" placeholder="Suche im Archiv…">
+      <input id="archSearch" type="text" placeholder="Search the archive…">
     </label>
   </div>
 
@@ -158,12 +158,12 @@
 
   <div id="noResults" class="no-results" hidden>
     <div class="nr-mark">⌕</div>
-    <h3>Keine Einträge gefunden</h3>
-    <p>Nichts passt zu dieser Suche. Versuch ein anderes Wort — oder <button type="button" class="nr-reset" onclick="resetArchive()">zeig mir alle Einträge</button>.</p>
+    <h3>No entries found</h3>
+    <p>Nothing matches that search. Try another word — or <button type="button" class="nr-reset" onclick="resetArchive()">show me everything</button>.</p>
   </div>
 
   <div class="archive-cta">
-    <button class="btn btn-ghost">Ältere Einträge laden</button>
+    <button class="btn btn-ghost">Load older entries</button>
   </div>
 </div>
 
@@ -171,7 +171,7 @@
   <div class="footer-inner">
     <div><h4>Deutsch <em>Entries</em></h4><p>A personal diary of learning German, one cultural detour at a time. Written in German, kept in English, dusted with lemon.</p></div>
     <div><div class="col-title">Pages</div><div class="footer-links"><a href="index.html">Home</a><a href="archive.html">Archive</a><a href="about.html">About</a><a href="login.html">Login</a></div></div>
-    <div><div class="col-title">Themen</div><div class="footer-links"><a href="archive.html">Sprache</a><a href="archive.html">Kultur</a><a href="archive.html">Reisen</a><a href="archive.html">Leben</a></div></div>
+    <div><div class="col-title">Topics</div><div class="footer-links"><a href="archive.html">Language</a><a href="archive.html">Culture</a><a href="archive.html">Travel</a><a href="archive.html">Life</a></div></div>
   </div>
   <div class="footer-base"><span>© 2026 Deutsch Entries — geschrieben mit Geduld.</span><span>Made with cream, carpets &amp; citrus.</span></div>
 </footer>
