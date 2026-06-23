@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"729259e189a5","js/auth.js":"6efed58365ea","js/public.js":"a9bbc4e0f4f4","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"729259e189a5","js/auth.js":"6efed58365ea","js/public.js":"82c588ec2cb8","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -1272,26 +1272,43 @@ try { (() => {
   }
 
   // ---------- SETTINGS (hero images, level, portrait) ----------
+  // On public pages, image-slots must NEVER be interactive — a visitor
+  // could otherwise drag their own image in. So every hero slot is
+  // replaced with either the real settings image or a static (non-
+  // draggable) placeholder.
   function applySettings(s) {
-    if (!s) return;
-    lockImage(document.getElementById("hero-arch"), s.hero_arch_url);
-    lockImage(document.getElementById("hero-round"), s.hero_round_url);
-    lockImage(document.getElementById("hero-rug"), s.hero_rug_url);
-    lockImage(document.getElementById("hero-lemon"), s.hero_citrus_url);
-    document.querySelectorAll("#author-portrait, #set-portrait").forEach(function (el) {
-      lockImage(el, s.portrait_url);
+    s = s || {};
+    fillOrBlank(document.getElementById("hero-arch"), s.hero_arch_url);
+    fillOrBlank(document.getElementById("hero-round"), s.hero_round_url);
+    fillOrBlank(document.getElementById("hero-rug"), s.hero_rug_url);
+    fillOrBlank(document.getElementById("hero-lemon"), s.hero_citrus_url);
+    document.querySelectorAll("#author-portrait").forEach(function (el) {
+      fillOrBlank(el, s.portrait_url);
     });
-    if (s.level) {
-      setText(document, "#statLevel", s.level);
-    }
+    if (s.level) setText(document, "#statLevel", s.level);
   }
-  function lockImage(slot, url) {
-    if (!slot || !url) return;
+
+  // non-interactive placeholder (subtle striped fill, no drag target)
+  function placeholderEl() {
+    var d = document.createElement("div");
+    d.setAttribute("aria-hidden", "true");
+    d.style.cssText = "width:100%;height:100%;display:block;" + "background:repeating-linear-gradient(135deg,#ece0cb,#ece0cb 11px,#e6d8c0 11px,#e6d8c0 22px);";
+    return d;
+  }
+  function imgEl(url) {
     var img = document.createElement("img");
     img.src = url;
     img.alt = "";
     img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
-    slot.replaceWith(img);
+    return img;
+  }
+  // replace a slot with a real image if we have one, else a static placeholder
+  function fillOrBlank(slot, url) {
+    if (!slot) return;
+    slot.replaceWith(url ? imgEl(url) : placeholderEl());
+  }
+  function lockImage(slot, url) {
+    fillOrBlank(slot, url);
   }
 
   // ---------------- HOME ----------------
@@ -1319,7 +1336,7 @@ try { (() => {
         var imgA = f.querySelector(".f-img");
         if (imgA) {
           imgA.setAttribute("href", link);
-          setSlot(imgA.querySelector("image-slot"), featured.thumb_url);
+          fillOrBlank(imgA.querySelector("image-slot"), featured.thumb_url);
         }
         setText(f, ".f-tag", "Featured · " + (featured.category || ""));
         setHTML(f, "h2", H.esc(featured.title));
@@ -1371,18 +1388,12 @@ try { (() => {
   function cardHTML(p, heightClass) {
     var link = "post.html?slug=" + encodeURIComponent(p.slug);
     var cls = "card" + (heightClass ? " " + heightClass : "");
-    var thumb = p.thumb_url ? '<img src="' + H.esc(p.thumb_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : '<image-slot shape="rect"></image-slot>';
+    var thumb = p.thumb_url ? '<img src="' + H.esc(p.thumb_url) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : '<div aria-hidden="true" style="width:100%;height:100%;background:repeating-linear-gradient(135deg,#ece0cb,#ece0cb 11px,#e6d8c0 11px,#e6d8c0 22px)"></div>';
     return '<a href="' + link + '" class="' + cls + '" data-cat="' + H.esc(H.catKey(p.category)) + '">' + '<div class="thumb"><span class="cat">' + H.esc(p.category || "") + "</span>" + thumb + "</div>" + '<div class="meta"><span>' + H.formatDateDE(p.publish_at) + "</span>·" + '<span class="de">' + readLabel(p.read_min) + "</span></div>" + "<h3>" + H.esc(p.title) + "</h3>" + '<p class="excerpt">' + H.esc(p.excerpt || H.autoExcerpt(p.body)) + "</p>" + '<span class="read">Weiterlesen →</span></a>';
   }
   function hydrate(scope) {/* images already inlined as <img> */}
   function setSlot(slot, url) {
-    if (slot && url) {
-      var img = document.createElement("img");
-      img.src = url;
-      img.alt = "";
-      img.style.cssText = "width:100%;height:100%;object-fit:cover;display:block;";
-      slot.replaceWith(img);
-    }
+    fillOrBlank(slot, url);
   }
 
   // ---------------- SINGLE POST ----------------
@@ -1414,9 +1425,7 @@ try { (() => {
       var when = document.querySelector(".byline .when");
       if (when) when.textContent = H.formatDateDE(p.publish_at) + " · " + readLabel(p.read_min) + " Lesezeit · auf Deutsch";
       var hero = document.querySelector(".post-hero image-slot");
-      if (hero) {
-        if (p.thumb_url) setSlot(hero, p.thumb_url);
-      }
+      if (hero) fillOrBlank(hero, p.thumb_url);
       var col = document.querySelector(".read-col");
       if (col) {
         col.innerHTML = H.mdToHtml(p.body || "");
@@ -1432,8 +1441,16 @@ try { (() => {
     reveal();
     fetchPublished(null).then(function (res) {
       var box = document.getElementById("aboutTimeline");
-      if (!box || res.error || !res.data || !res.data.length) return;
-      var asc = res.data.slice().reverse(); // oldest → newest
+      if (!box) return;
+      var posts = res && res.data || [];
+      // A "journey" needs a few entries — until then, hide the section
+      // rather than show a single milestone that looks like filler.
+      if (res.error || posts.length < 2) {
+        var sec = box.closest("section");
+        if (sec) sec.style.display = "none";else box.style.display = "none";
+        return;
+      }
+      var asc = posts.slice().reverse(); // oldest → newest
       var picks = [];
       picks.push({
         p: asc[0],
@@ -1443,7 +1460,7 @@ try { (() => {
         p: asc[Math.floor(asc.length / 2)],
         head: "Finding a rhythm"
       });
-      if (asc.length > 1) picks.push({
+      picks.push({
         p: asc[asc.length - 1],
         head: "Where I am now"
       });

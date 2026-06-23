@@ -55,14 +55,35 @@
   // draggable) placeholder.
   function applySettings(s) {
     s = s || {};
+    // home hero collage
     fillOrBlank(document.getElementById("hero-arch"), s.hero_arch_url);
     fillOrBlank(document.getElementById("hero-round"), s.hero_round_url);
     fillOrBlank(document.getElementById("hero-rug"), s.hero_rug_url);
     fillOrBlank(document.getElementById("hero-lemon"), s.hero_citrus_url);
+    // about-page collage (these were previously left draggable — the bug)
+    fillOrBlank(document.getElementById("about-main"), s.portrait_url);
+    fillOrBlank(document.getElementById("about-rug"), s.hero_rug_url);
+    fillOrBlank(document.getElementById("about-citrus"), s.hero_citrus_url);
+    // portrait(s)
     document.querySelectorAll("#author-portrait").forEach(function (el) {
       fillOrBlank(el, s.portrait_url);
     });
     if (s.level) setText(document, "#statLevel", s.level);
+
+    // DEFENSIVE SWEEP: a public page must never contain an interactive
+    // image-slot (a visitor could otherwise drag in their own image).
+    // Replace every remaining slot with a static placeholder — but skip
+    // CONTENT slots, which the page's own render function fills with the
+    // post's real thumbnail.
+    sweepRemainingSlots();
+  }
+
+  function sweepRemainingSlots() {
+    document.querySelectorAll("image-slot").forEach(function (slot) {
+      // these are filled by renderHome / renderPost with the real thumb
+      if (slot.closest(".f-img, .post-hero, .thumb")) return;
+      slot.replaceWith(placeholderEl());
+    });
   }
 
   // non-interactive placeholder (subtle striped fill, no drag target)
