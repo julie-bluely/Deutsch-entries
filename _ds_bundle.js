@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"729259e189a5","js/auth.js":"6efed58365ea","js/public.js":"3799707db3a2","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"340dfcfd20d8","js/auth.js":"6efed58365ea","js/public.js":"f2f0b7317bdd","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -914,11 +914,14 @@ try { (() => {
       setVal("#setBio", s.author_bio || "");
       setVal("#setInstagram", s.instagram || "");
       setVal("#setEmail", s.email || "");
-      previewInto(document.getElementById("set-hero-arch"), s.hero_arch_url);
-      previewInto(document.getElementById("set-hero-round"), s.hero_round_url);
-      previewInto(document.getElementById("set-hero-rug"), s.hero_rug_url);
-      previewInto(document.getElementById("set-hero-citrus"), s.hero_citrus_url);
-      previewInto(document.getElementById("set-portrait"), s.portrait_url);
+      previewInto(document.getElementById("set-home-arch"), s.hero_arch_url);
+      previewInto(document.getElementById("set-home-round"), s.hero_round_url);
+      previewInto(document.getElementById("set-home-rug"), s.hero_rug_url);
+      previewInto(document.getElementById("set-home-lemon"), s.hero_citrus_url);
+      previewInto(document.getElementById("set-home-portrait"), s.portrait_url);
+      previewInto(document.getElementById("set-about-main"), s.about_main_url);
+      previewInto(document.getElementById("set-about-rug"), s.about_rug_url);
+      previewInto(document.getElementById("set-about-lemon"), s.about_lemon_url);
       setText("#dashLevel", currentLevel);
     });
   }
@@ -936,6 +939,18 @@ try { (() => {
         }).catch(function (e) {
           alert("Upload failed: " + (e.message || e));
         });
+      });
+    });
+    // CLEAR buttons — remove the picture, fall back to the default placeholder
+    document.querySelectorAll(".sh-clear[data-clear]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var col = btn.getAttribute("data-clear");
+        pendingSettings[col] = null; // null on save → cleared in DB
+        var card = btn.closest(".img-slot-card");
+        var holder = card && card.querySelector(".upload-slot");
+        if (holder) clearPreview(holder);
+        flash(btn, "Cleared");
       });
     });
     // save buttons (topbar + bottom of settings)
@@ -1086,6 +1101,21 @@ try { (() => {
       return;
     }
     if (slotOrImg.setAttribute) slotOrImg.setAttribute("src", url);
+  }
+  // empty a settings preview back to its dashed placeholder
+  function clearPreview(holder) {
+    if (!holder) return;
+    var img = holder.querySelector("img");
+    if (img) img.remove();
+    var slot = holder.querySelector("image-slot");
+    if (slot) {
+      slot.removeAttribute("src");
+      if (typeof slot.clear === "function") {
+        try {
+          slot.clear();
+        } catch (e) {}
+      }
+    }
   }
   function flash(btn, msg) {
     if (!btn) return;
@@ -1283,10 +1313,10 @@ try { (() => {
     fillOrBlank(document.getElementById("hero-round"), s.hero_round_url);
     fillOrBlank(document.getElementById("hero-rug"), s.hero_rug_url);
     fillOrBlank(document.getElementById("hero-lemon"), s.hero_citrus_url);
-    // about-page collage (these were previously left draggable — the bug)
-    fillOrBlank(document.getElementById("about-main"), s.portrait_url);
-    fillOrBlank(document.getElementById("about-rug"), s.hero_rug_url);
-    fillOrBlank(document.getElementById("about-citrus"), s.hero_citrus_url);
+    // about-page collage — its own columns now
+    fillOrBlank(document.getElementById("about-main"), s.about_main_url);
+    fillOrBlank(document.getElementById("about-rug"), s.about_rug_url);
+    fillOrBlank(document.getElementById("about-citrus"), s.about_lemon_url);
     // portrait(s)
     document.querySelectorAll("#author-portrait").forEach(function (el) {
       fillOrBlank(el, s.portrait_url);

@@ -75,6 +75,14 @@ body{ background:var(--cream-deep); }
 .set-hero .sh-slot{ height:130px; border:2px dashed var(--terra-soft); border-radius:12px; overflow:hidden; background:var(--cream); }
 .set-hero .sh-slot image-slot{ width:100%; height:100%; }
 .set-hero .sh-cap{ font-size:12px; color:var(--ink-faint); margin-top:8px; text-align:center; }
+/* labeled image-slot cards (settings) */
+.img-group{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:18px; }
+.img-slot-card .sh-slot{ position:relative; height:130px; border:2px dashed var(--terra-soft); border-radius:12px; overflow:hidden; background:var(--cream); }
+.img-slot-card .sh-slot image-slot{ width:100%; height:100%; }
+.img-slot-card .sh-cap{ font-size:12.5px; color:var(--ink-soft); margin-top:9px; font-weight:600; line-height:1.2; }
+.img-slot-card .sh-cap small{ display:block; font-weight:400; color:var(--ink-faint); font-size:11.5px; letter-spacing:0; text-transform:none; margin-top:3px; }
+.img-slot-card .sh-clear{ margin-top:6px; font-size:11px; letter-spacing:.09em; text-transform:uppercase; font-weight:600; color:var(--ink-faint); background:none; border:none; cursor:pointer; padding:2px 0; font-family:var(--sans); }
+.img-slot-card .sh-clear:hover{ color:#a3322a; }
 .set-portrait{ display:flex; align-items:center; gap:18px; }
 .set-portrait .sp-img{ width:84px; height:84px; border-radius:50%; overflow:hidden; flex:none; box-shadow:var(--shadow-soft); }
 .set-portrait .sp-img image-slot{ width:100%; height:100%; }
@@ -355,24 +363,62 @@ body{ background:var(--cream-deep); }
 
           <div class="set-box">
             <h3>Author</h3>
-            <p class="h-sub">Shown on the About page and post bylines.</p>
-            <div class="set-portrait">
-              <div class="sp-img upload-slot" data-col="portrait_url"><image-slot id="set-portrait" shape="rect" placeholder="Portrait"></image-slot></div>
-              <div style="flex:1">
-                <div class="field" style="margin-bottom:12px"><label>Display name</label><input id="setName" type="text" value="die Autorin"></div>
-              </div>
-            </div>
-            <div class="field" style="margin-top:16px"><label>Short bio</label><textarea id="setBio" rows="3">Eine Lernende, kein Profi. Ich schreibe dieses Tagebuch, um mein Deutsch zu üben — Korrekturen sind herzlich willkommen.</textarea></div>
+            <p class="h-sub">Display name and bio shown on bylines.</p>
+            <div class="field" style="margin-bottom:12px"><label>Display name</label><input id="setName" type="text" value="die Autorin"></div>
+            <div class="field"><label>Short bio</label><textarea id="setBio" rows="3">Eine Lernende, kein Profi. Ich schreibe dieses Tagebuch, um mein Deutsch zu üben — Korrekturen sind herzlich willkommen.</textarea></div>
           </div>
 
           <div class="set-box full">
-            <h3>Home hero images</h3>
-            <p class="h-sub">The fixed collage on the home page — set once, used as site dressing (separate from per-post thumbnails). Only you, signed in, can change these; visitors can only view them.</p>
-            <div class="set-hero">
-              <div><div class="sh-slot upload-slot" data-col="hero_arch_url"><image-slot id="set-hero-arch" shape="rect" placeholder="Cathedral / castle"></image-slot></div><div class="sh-cap">Architecture</div></div>
-              <div><div class="sh-slot upload-slot" data-col="hero_round_url"><image-slot id="set-hero-round" shape="rect" placeholder="Persian rug"></image-slot></div><div class="sh-cap">Rug detail</div></div>
-              <div><div class="sh-slot upload-slot" data-col="hero_rug_url"><image-slot id="set-hero-rug" shape="rect" placeholder="Stonework"></image-slot></div><div class="sh-cap">Stonework</div></div>
-              <div><div class="sh-slot upload-slot" data-col="hero_citrus_url"><image-slot id="set-hero-citrus" shape="rect" placeholder="Lemon"></image-slot></div><div class="sh-cap">Lemon</div></div>
+            <h3>Home page images</h3>
+            <p class="h-sub">The collage on the home page. Each slot below shows exactly where the picture appears. Drop in an image, or press Clear to fall back to the default tinted placeholder. Only you, signed in, can change these.</p>
+            <div class="img-group">
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="hero_arch_url"><image-slot id="set-home-arch" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Arch image <small>top-right · large</small></div>
+                <button type="button" class="sh-clear" data-clear="hero_arch_url">Clear</button>
+              </div>
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="hero_round_url"><image-slot id="set-home-round" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Round detail <small>bottom-left · circle</small></div>
+                <button type="button" class="sh-clear" data-clear="hero_round_url">Clear</button>
+              </div>
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="hero_rug_url"><image-slot id="set-home-rug" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Stonework <small>bottom-right · small</small></div>
+                <button type="button" class="sh-clear" data-clear="hero_rug_url">Clear</button>
+              </div>
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="hero_citrus_url"><image-slot id="set-home-lemon" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Lemon accent <small>top · floating dot</small></div>
+                <button type="button" class="sh-clear" data-clear="hero_citrus_url">Clear</button>
+              </div>
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="portrait_url"><image-slot id="set-home-portrait" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Author portrait <small>quote section · below hero</small></div>
+                <button type="button" class="sh-clear" data-clear="portrait_url">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="set-box full">
+            <h3>About page images</h3>
+            <p class="h-sub">The collage at the top of the About page — separate from the home page, so you can use different pictures here.</p>
+            <div class="img-group">
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="about_main_url"><image-slot id="set-about-main" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Main image <small>right · large arch</small></div>
+                <button type="button" class="sh-clear" data-clear="about_main_url">Clear</button>
+              </div>
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="about_rug_url"><image-slot id="set-about-rug" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Rug corner <small>bottom-left</small></div>
+                <button type="button" class="sh-clear" data-clear="about_rug_url">Clear</button>
+              </div>
+              <div class="img-slot-card">
+                <div class="sh-slot upload-slot" data-col="about_lemon_url"><image-slot id="set-about-lemon" shape="rect" placeholder="Drop image"></image-slot></div>
+                <div class="sh-cap">Lemon accent <small>upper-left · floating dot</small></div>
+                <button type="button" class="sh-clear" data-clear="about_lemon_url">Clear</button>
+              </div>
             </div>
           </div>
 

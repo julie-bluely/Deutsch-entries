@@ -60,10 +60,10 @@
     fillOrBlank(document.getElementById("hero-round"), s.hero_round_url);
     fillOrBlank(document.getElementById("hero-rug"), s.hero_rug_url);
     fillOrBlank(document.getElementById("hero-lemon"), s.hero_citrus_url);
-    // about-page collage (these were previously left draggable — the bug)
-    fillOrBlank(document.getElementById("about-main"), s.portrait_url);
-    fillOrBlank(document.getElementById("about-rug"), s.hero_rug_url);
-    fillOrBlank(document.getElementById("about-citrus"), s.hero_citrus_url);
+    // about-page collage — its own columns now
+    fillOrBlank(document.getElementById("about-main"), s.about_main_url);
+    fillOrBlank(document.getElementById("about-rug"), s.about_rug_url);
+    fillOrBlank(document.getElementById("about-citrus"), s.about_lemon_url);
     // portrait(s)
     document.querySelectorAll("#author-portrait").forEach(function (el) {
       fillOrBlank(el, s.portrait_url);

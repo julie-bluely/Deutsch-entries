@@ -218,11 +218,14 @@
       setVal("#setBio", s.author_bio || "");
       setVal("#setInstagram", s.instagram || "");
       setVal("#setEmail", s.email || "");
-      previewInto(document.getElementById("set-hero-arch"), s.hero_arch_url);
-      previewInto(document.getElementById("set-hero-round"), s.hero_round_url);
-      previewInto(document.getElementById("set-hero-rug"), s.hero_rug_url);
-      previewInto(document.getElementById("set-hero-citrus"), s.hero_citrus_url);
-      previewInto(document.getElementById("set-portrait"), s.portrait_url);
+      previewInto(document.getElementById("set-home-arch"), s.hero_arch_url);
+      previewInto(document.getElementById("set-home-round"), s.hero_round_url);
+      previewInto(document.getElementById("set-home-rug"), s.hero_rug_url);
+      previewInto(document.getElementById("set-home-lemon"), s.hero_citrus_url);
+      previewInto(document.getElementById("set-home-portrait"), s.portrait_url);
+      previewInto(document.getElementById("set-about-main"), s.about_main_url);
+      previewInto(document.getElementById("set-about-rug"), s.about_rug_url);
+      previewInto(document.getElementById("set-about-lemon"), s.about_lemon_url);
       setText("#dashLevel", currentLevel);
     });
   }
@@ -236,6 +239,18 @@
         previewInto(slotWrap.querySelector("image-slot, img"), URL.createObjectURL(f));
         uploadToBucket(f).then(function (url) { pendingSettings[col] = url; })
           .catch(function (e) { alert("Upload failed: " + (e.message || e)); });
+      });
+    });
+    // CLEAR buttons — remove the picture, fall back to the default placeholder
+    document.querySelectorAll(".sh-clear[data-clear]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        var col = btn.getAttribute("data-clear");
+        pendingSettings[col] = null;               // null on save → cleared in DB
+        var card = btn.closest(".img-slot-card");
+        var holder = card && card.querySelector(".upload-slot");
+        if (holder) clearPreview(holder);
+        flash(btn, "Cleared");
       });
     });
     // save buttons (topbar + bottom of settings)
@@ -346,6 +361,17 @@
     if (!slotOrImg || !url) return;
     if (slotOrImg.tagName === "IMG") { slotOrImg.src = url; return; }
     if (slotOrImg.setAttribute) slotOrImg.setAttribute("src", url);
+  }
+  // empty a settings preview back to its dashed placeholder
+  function clearPreview(holder) {
+    if (!holder) return;
+    var img = holder.querySelector("img");
+    if (img) img.remove();
+    var slot = holder.querySelector("image-slot");
+    if (slot) {
+      slot.removeAttribute("src");
+      if (typeof slot.clear === "function") { try { slot.clear(); } catch (e) {} }
+    }
   }
   function flash(btn, msg) {
     if (!btn) return;

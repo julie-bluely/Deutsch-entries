@@ -22,6 +22,9 @@ create table if not exists settings (
   hero_rug_url   text,
   hero_citrus_url text,
   portrait_url   text,
+  about_main_url text,
+  about_rug_url  text,
+  about_lemon_url text,
   updated_at     timestamptz default now(),
   constraint settings_singleton check (id = 1)
 );
