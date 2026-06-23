@@ -1,4 +1,4 @@
-/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"340dfcfd20d8","js/auth.js":"6efed58365ea","js/public.js":"f2f0b7317bdd","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
+/* @ds-bundle: {"format":3,"namespace":"GermanEntries_529ea7","components":[],"sourceHashes":{"image-slot.js":"9309434cb09c","js/admin.js":"53a36969bc74","js/auth.js":"6efed58365ea","js/public.js":"f2f0b7317bdd","js/shared.js":"25b08a571cc1","site.js":"4c44c1f46d4b","supabase-config.js":"9b109f105a42"},"inlinedExternals":[],"unexposedExports":[]} */
 
 (() => {
 
@@ -673,7 +673,8 @@ try { (() => {
   var editingId = null;
   var pendingImageFile = null;
   var pendingImageExistingUrl = null;
-  var pendingSettings = {}; // settings image URLs picked but not yet saved
+  var pendingSettings = {}; // settings image URLs/nulls picked but not yet saved
+  var pendingSettingsFiles = {}; // settings images picked, uploaded at save time
   var currentLevel = "A2";
   if (window.__ADMIN_SESSION) start();else document.addEventListener("admin-authed", start);
   function start() {
@@ -934,11 +935,9 @@ try { (() => {
         var f = input.files && input.files[0];
         if (!f) return;
         previewInto(slotWrap.querySelector("image-slot, img"), URL.createObjectURL(f));
-        uploadToBucket(f).then(function (url) {
-          pendingSettings[col] = url;
-        }).catch(function (e) {
-          alert("Upload failed: " + (e.message || e));
-        });
+        // defer the actual upload to save time so a quick Save can't miss it
+        pendingSettingsFiles[col] = f;
+        delete pendingSettings[col];
       });
     });
     // CLEAR buttons — remove the picture, fall back to the default placeholder
@@ -947,6 +946,7 @@ try { (() => {
         e.preventDefault();
         var col = btn.getAttribute("data-clear");
         pendingSettings[col] = null; // null on save → cleared in DB
+        delete pendingSettingsFiles[col]; // cancel any pending upload
         var card = btn.closest(".img-slot-card");
         var holder = card && card.querySelector(".upload-slot");
         if (holder) clearPreview(holder);
@@ -973,29 +973,47 @@ try { (() => {
       email: getVal("#setEmail"),
       updated_at: new Date().toISOString()
     };
-    Object.keys(pendingSettings).forEach(function (k) {
-      rec[k] = pendingSettings[k];
-    });
     var label = btn ? btn.innerHTML : "";
     if (btn) {
       btn.disabled = true;
       btn.innerHTML = "Saving…";
     }
-    db.from("settings").upsert(rec, {
-      onConflict: "id"
-    }).then(function (res) {
+    function restore() {
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = label;
       }
-      if (res.error) {
-        alert("Could not save settings: " + res.error.message);
+    }
+
+    // 1) upload every freshly-picked image FIRST, then 2) upsert the row.
+    var cols = Object.keys(pendingSettingsFiles);
+    var uploads = cols.map(function (col) {
+      return uploadToBucket(pendingSettingsFiles[col]).then(function (url) {
+        rec[col] = url;
+      });
+    });
+    Promise.all(uploads).then(function () {
+      // cleared images (null) and any already-resolved urls
+      Object.keys(pendingSettings).forEach(function (k) {
+        rec[k] = pendingSettings[k];
+      });
+      return db.from("settings").upsert(rec, {
+        onConflict: "id"
+      });
+    }).then(function (res) {
+      restore();
+      if (!res || res.error) {
+        alert("Could not save settings: " + (res && res.error && res.error.message || "unknown error"));
         return;
       }
       currentLevel = rec.level;
       setText("#dashLevel", currentLevel);
       pendingSettings = {};
+      pendingSettingsFiles = {};
       flash(btn, "Saved ✓");
+    }).catch(function (e) {
+      restore();
+      alert("Could not save settings: " + (e && e.message ? e.message : e));
     });
   }
 
